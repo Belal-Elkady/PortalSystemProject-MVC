@@ -62,24 +62,52 @@ namespace DAL.Repositories
                 throw new DataAccessException(ex, "", _logger);
             }
         }
-
+        //old update method
+        //public bool Update(T entity)
+        //{
+        //    try
+        //    {
+        //        var dbData = GetById(entity.Id);
+        //        entity.CreatedDate = dbData.CreatedDate;
+        //        entity.CreatedBy = dbData.CreatedBy;
+        //        entity.UpdatedDate = DateTime.Now;
+        //        _context.Update(entity).State = EntityState.Modified;
+        //        _context.SaveChanges();
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new DataAccessException(ex, "", _logger);
+        //    }
+        //}
         public bool Update(T entity)
         {
             try
             {
                 var dbData = GetById(entity.Id);
+                if (dbData == null)
+                    return false;
+
+                // Keep original created data
                 entity.CreatedDate = dbData.CreatedDate;
                 entity.CreatedBy = dbData.CreatedBy;
                 entity.UpdatedDate = DateTime.Now;
-                _context.Update(entity).State = EntityState.Modified;
+
+                //  Detach the old tracked entity to avoid conflict
+                _context.Entry(dbData).State = EntityState.Detached;
+
+                //  Attach the new one as modified
+                _context.Entry(entity).State = EntityState.Modified;
+
                 _context.SaveChanges();
                 return true;
             }
             catch (Exception ex)
             {
-                throw new DataAccessException(ex, "", _logger);
+                throw new DataAccessException(ex, "Error while updating entity", _logger);
             }
         }
+
 
         public bool Delete(Guid id)
         {
