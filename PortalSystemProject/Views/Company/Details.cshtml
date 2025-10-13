@@ -1,0 +1,59 @@
+﻿@model BL.Dtos.CompanyDto
+@{
+    ViewData["Title"] = "Company Details";
+}
+
+<div class="container mt-4 col-md-8">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h4><i class="bi bi-info-circle"></i> Company Details</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Website</dt>
+                <dd class="col-sm-9">@Model.Website</dd>
+
+                <dt class="col-sm-3">Country</dt>
+                <dd class="col-sm-9">@Model.Country</dd>
+
+                <dt class="col-sm-3">City</dt>
+                <dd class="col-sm-9">@Model.City</dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Status == 1)
+                    {
+                        <span class="badge bg-success">Approved</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Description</dt>
+                <dd class="col-sm-9">@Model.Description</dd>
+
+                @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                {
+                    <dt class="col-sm-3">Logo</dt>
+                    <dd class="col-sm-9">
+                        <img src="@Model.LogoUrl" alt="Logo" class="img-fluid rounded" style="max-height:120px;" />
+                    </dd>
+                }
+            </dl>
+
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle"></i> Back
+                </a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="bi bi-pencil-square"></i> Edit
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
