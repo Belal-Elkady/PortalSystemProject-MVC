@@ -1,0 +1,33 @@
+﻿@model BL.Dtos.JobPostDto
+@{
+    ViewData["Title"] = "Job Details";
+}
+
+<div class="container mt-4 col-md-8">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h4><i class="bi bi-briefcase"></i> @Model.Title</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Description:</strong> @Model.Description</p>
+            <p><strong>Location:</strong> @Model.City, @Model.Country</p>
+            <p><strong>Experience:</strong> @Model.MinExperienceYears - @Model.MaxExperienceYears years</p>
+            <p>
+                <strong>Salary:</strong>
+                @(Model.MinSalary.HasValue ? $"{Model.MinSalary:C0}" : "N/A") -
+                @(Model.MaxSalary.HasValue ? $"{Model.MaxSalary:C0}" : "N/A")
+            </p>
+            <p><strong>Currency:</strong> @Model.Currency</p>
+            <p><strong>Active:</strong> @(Model.IsActive ? "Yes" : "No")</p>
+
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle"></i> Back
+                </a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="bi bi-pencil-square"></i> Edit
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
