@@ -155,6 +155,7 @@ namespace PortalSystemProject.Controllers
         }
 
         // POST: Edit/{id}
+        // POST: Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Guid id, JobPostDto dto)
@@ -166,13 +167,24 @@ namespace PortalSystemProject.Controllers
             {
                 try
                 {
+                    // Get the existing job post to preserve fields not in the form
+                    var existingJobPost = _jobPostRepo.GetById(id);
+                    if (existingJobPost == null)
+                        return NotFound();
+
+                    // Preserve these fields from the existing record
+                    dto.PublishedAt = existingJobPost.PublishedAt;
+                    dto.CreatedByUserId = existingJobPost.CreatedByUserId;
+                    dto.IsActive = existingJobPost.IsActive;
+
+                    // Update the job post
                     _jobPostRepo.Update(dto);
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error updating JobPost");
-                    throw;
+                    ModelState.AddModelError("", "An error occurred while updating the job post. Please try again.");
                 }
             }
 

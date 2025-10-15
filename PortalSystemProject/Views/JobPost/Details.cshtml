@@ -19,6 +19,8 @@
             </p>
             <p><strong>Currency:</strong> @Model.Currency</p>
             <p><strong>Active:</strong> @(Model.IsActive ? "Yes" : "No")</p>
+            <p><strong>Requirements:</strong> @Model.Requirements</p>
+            <p><strong>Experience:</strong> @Model.MinExperienceYears</p>
 
             <div class="d-flex justify-content-between">
                 <a asp-action="Index" class="btn btn-secondary">
