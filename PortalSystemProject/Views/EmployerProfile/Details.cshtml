@@ -1,0 +1,29 @@
+﻿@model BL.Dtos.EmployerProfileDto
+@{
+    ViewData["Title"] = "Employer Details";
+}
+
+<div class="container mt-4 col-md-8">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h4><i class="bi bi-eye"></i> Employer Profile Details</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Company</dt>
+                <dd class="col-sm-8">@Model.CompanyId</dd>
+
+                <dt class="col-sm-4">Job Title</dt>
+                <dd class="col-sm-8">@Model.JobTitle</dd>
+
+                <dt class="col-sm-4">User ID</dt>
+                <dd class="col-sm-8">@Model.UserId</dd>
+
+                <dt class="col-sm-4">Created At</dt>
+                <dd class="col-sm-8">@Model.CreatedAt</dd>
+            </dl>
+
+            <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+        </div>
+    </div>
+</div>
