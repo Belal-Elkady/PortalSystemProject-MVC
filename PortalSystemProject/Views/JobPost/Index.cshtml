@@ -4,55 +4,166 @@
 }
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-bold text-primary"><i class="bi bi-briefcase"></i> Job Posts</h2>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> New Job
-        </a>
-    </div>
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><i class="bi bi-briefcase"></i> Job Posts</h3>
+                <a asp-action="Create" class="btn btn-light btn-sm fw-bold">
+                    <i class="bi bi-plus-circle"></i> New Job
+                </a>
+            </div>
+        </div>
 
-    <table class="table table-hover shadow-sm">
-        <thead class="table-dark">
-            <tr>
-                <th>Title</th>
-                <th>City</th>
-                <th>Category</th>
-                <th>Type</th>
-                <th>Salary Range</th>
-                <th class="text-end">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
+        <div class="card-body">
+            <form method="get" class="row mb-4">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="Search by title, city, or country" value="@ViewBag.Search" />
+                </div>
+                <div class="col-md-3">
+                    <select name="categoryId" class="form-select" asp-items="ViewBag.JobCategories">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="typeId" class="form-select" asp-items="ViewBag.JobTypes">
+                        <option value="">All Job Types</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </form>
+
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>
+                            <a asp-action="Index" asp-route-sortOrder="@ViewBag.TitleSort" class="text-white text-decoration-none">
+                                Title
+                                @(ViewBag.SortOrder?.StartsWith("title") == true ?
+                                                                (ViewBag.SortOrder.EndsWith("asc") ? "▲" : "▼") : "")
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-action="Index" asp-route-sortOrder="@ViewBag.CitySort" class="text-white text-decoration-none">
+                                City
+                                @(ViewBag.SortOrder?.StartsWith("city") == true ?
+                                                                (ViewBag.SortOrder.EndsWith("asc") ? "▲" : "▼") : "")
+                            </a>
+                        </th>
+                        <th>Category</th>
+                        <th>Type</th>
+                        <th>
+                            <a asp-action="Index" asp-route-sortOrder="@ViewBag.SalarySort" class="text-white text-decoration-none">
+                                Salary Range
+                                @(ViewBag.SortOrder?.StartsWith("salary") == true ?
+                                                                (ViewBag.SortOrder.EndsWith("asc") ? "▲" : "▼") : "")
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-action="Index" asp-route-sortOrder="@ViewBag.DateSort" class="text-white text-decoration-none">
+                                Published
+                                @(ViewBag.SortOrder?.StartsWith("date") == true ?
+                                                                (ViewBag.SortOrder.EndsWith("asc") ? "▲" : "▼") : "")
+                            </a>
+                        </th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No job posts found.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Title</td>
+                                <td>@item.City</td>
+                                <td>@item.JobCategoryId</td>
+                                <td>@item.JobTypeId</td>
+                                <td>
+                                    @if (item.MinSalary.HasValue || item.MaxSalary.HasValue)
+                                    {
+                                        @($"{item.MinSalary:C0} - {item.MaxSalary:C0}")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm me-1">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm me-1">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            <!-- Pagination -->
+            @if (ViewBag.TotalPages > 1)
             {
-                <tr>
-                    <td>@item.Title</td>
-                    <td>@item.City</td>
-                    <td>@item.JobCategoryId</td>
-                    <td>@item.JobTypeId</td>
-                    <td>
-                        @if (item.MinSalary.HasValue || item.MaxSalary.HasValue)
+                <nav aria-label="JobPost pagination">
+                    <ul class="pagination justify-content-center mt-4">
+
+                        <!-- Previous -->
+                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-search="@ViewBag.Search"
+                               asp-route-categoryId="@Context.Request.Query["categoryId"]"
+                               asp-route-typeId="@Context.Request.Query["typeId"]"
+                               asp-route-page="@(ViewBag.CurrentPage - 1)">
+                                &laquo; Prev
+                            </a>
+                        </li>
+
+                        <!-- Page Numbers -->
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
                         {
-                            @($"{item.MinSalary:C0} - {item.MaxSalary:C0}")
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-search="@ViewBag.Search"
+                                   asp-route-categoryId="@Context.Request.Query["categoryId"]"
+                                   asp-route-typeId="@Context.Request.Query["typeId"]"
+                                   asp-route-page="@i">
+                                    @i
+                                </a>
+                            </li>
                         }
-                        else
-                        {
-                            <span class="text-muted">N/A</span>
-                        }
-                    </td>
-                    <td class="text-end">
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm me-1">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm me-1">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm">
-                            <i class="bi bi-trash"></i>
-                        </a>
-                    </td>
-                </tr>
+
+                        <!-- Next -->
+                        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-search="@ViewBag.Search"
+                               asp-route-categoryId="@Context.Request.Query["categoryId"]"
+                               asp-route-typeId="@Context.Request.Query["typeId"]"
+                               asp-route-page="@(ViewBag.CurrentPage + 1)">
+                                Next &raquo;
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
             }
-        </tbody>
-    </table>
+
+        </div>
+    </div>
 </div>

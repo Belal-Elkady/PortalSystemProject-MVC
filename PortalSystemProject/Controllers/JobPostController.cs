@@ -27,12 +27,70 @@ namespace PortalSystemProject.Controllers
             _logger = logger;
         }
 
+
+
         // GET: JobPost
-        public IActionResult Index()
+        public IActionResult Index(string search, Guid? categoryId, Guid? typeId, string sortOrder, int page = 1, int pageSize = 5)
         {
             var jobPosts = _jobPostRepo.GetAll();
+
+            //  Search
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.ToLower();
+                jobPosts = jobPosts.Where(j =>
+                    j.Title.ToLower().Contains(search) ||
+                    (j.City != null && j.City.ToLower().Contains(search)) ||
+                    (j.Country != null && j.Country.ToLower().Contains(search))
+                ).ToList();
+            }
+
+            //  Filters
+            if (categoryId.HasValue && categoryId.Value != Guid.Empty)
+                jobPosts = jobPosts.Where(j => j.JobCategoryId == categoryId.Value).ToList();
+
+            if (typeId.HasValue && typeId.Value != Guid.Empty)
+                jobPosts = jobPosts.Where(j => j.JobTypeId == typeId.Value).ToList();
+
+            //  Sorting
+            ViewBag.TitleSort = sortOrder == "title_asc" ? "title_desc" : "title_asc";
+            ViewBag.CitySort = sortOrder == "city_asc" ? "city_desc" : "city_asc";
+            ViewBag.SalarySort = sortOrder == "salary_asc" ? "salary_desc" : "salary_asc";
+            ViewBag.DateSort = sortOrder == "date_asc" ? "date_desc" : "date_asc";
+
+            jobPosts = sortOrder switch
+            {
+                "title_desc" => jobPosts.OrderByDescending(j => j.Title).ToList(),
+                "title_asc" => jobPosts.OrderBy(j => j.Title).ToList(),
+                "city_desc" => jobPosts.OrderByDescending(j => j.City).ToList(),
+                "city_asc" => jobPosts.OrderBy(j => j.City).ToList(),
+                "salary_desc" => jobPosts.OrderByDescending(j => j.MaxSalary).ToList(),
+                "salary_asc" => jobPosts.OrderBy(j => j.MinSalary).ToList(),
+                "date_desc" => jobPosts.OrderByDescending(j => j.PublishedAt).ToList(),
+                "date_asc" => jobPosts.OrderBy(j => j.PublishedAt).ToList(),
+                _ => jobPosts.OrderByDescending(j => j.PublishedAt).ToList()
+            };
+
+            //  Pagination
+            int totalItems = jobPosts.Count;
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            jobPosts = jobPosts.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            //  Send view data
+            ViewBag.JobCategories = new SelectList(_categoryRepo.GetAll(), "Id", "Name", categoryId);
+            ViewBag.JobTypes = new SelectList(_typeRepo.GetAll(), "Id", "Name", typeId);
+            ViewBag.Search = search;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.SortOrder = sortOrder;
+
             return View(jobPosts);
         }
+
+
+
 
         // GET: Create
         [HttpGet]
@@ -42,7 +100,7 @@ namespace PortalSystemProject.Controllers
             return View();
         }
 
-       //POST: Create
+        //POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(JobPostDto dto)
@@ -50,7 +108,9 @@ namespace PortalSystemProject.Controllers
             if (ModelState.IsValid)
             {
                 dto.PublishedAt = DateTime.Now;
-                dto.CreatedByUserId = Guid.NewGuid(); // placeholder (later bind from logged-in user)
+                //dto.CreatedByUserId = Guid.NewGuid(); // placeholder (later bind from logged-in user)
+                dto.CreatedByUserId = new Guid("C593B4A8-7A98-4A9C-92D9-1018B41CDD72");
+
                 _jobPostRepo.Add(dto);
                 return RedirectToAction(nameof(Index));
             }
