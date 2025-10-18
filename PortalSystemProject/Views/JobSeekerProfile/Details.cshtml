@@ -1,0 +1,65 @@
+﻿@model BL.Dtos.JobSeekerProfileDto
+@{
+    ViewData["Title"] = "Job Seeker Details";
+}
+
+<div class="container mt-4 col-md-8">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h4><i class="bi bi-person-circle"></i> Job Seeker Details</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Headline</dt>
+                <dd class="col-sm-8">@Model.Headline</dd>
+
+                <dt class="col-sm-4">Summary</dt>
+                <dd class="col-sm-8">@Model.Summary</dd>
+
+                <dt class="col-sm-4">Country</dt>
+                <dd class="col-sm-8">@Model.Country</dd>
+
+                <dt class="col-sm-4">City</dt>
+                <dd class="col-sm-8">@Model.City</dd>
+
+                <dt class="col-sm-4">Years of Experience</dt>
+                <dd class="col-sm-8">@Model.YearsOfExperience</dd>
+
+                <dt class="col-sm-4">Created</dt>
+                <dd class="col-sm-8">@Model.CreatedAt.ToShortDateString()</dd>
+            </dl>
+
+            <hr />
+            <h5 class="mt-3"><i class="bi bi-file-earmark-text"></i> CV</h5>
+
+            @if (!string.IsNullOrEmpty(Model.CvFilePath))
+            {
+                <div class="alert alert-success d-flex justify-content-between align-items-center">
+                    <span>CV uploaded:</span>
+                    <a href="@Model.CvFilePath" target="_blank" class="btn btn-sm btn-outline-light">
+                        <i class="bi bi-box-arrow-up-right"></i> View CV
+                    </a>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No CV uploaded yet.</p>
+            }
+
+            <form asp-action="UploadCv" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <input type="file" name="cvFile" class="form-control" accept=".pdf,.doc,.docx" />
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-upload"></i> Upload CV
+                </button>
+            </form>
+
+            <div class="mt-3">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

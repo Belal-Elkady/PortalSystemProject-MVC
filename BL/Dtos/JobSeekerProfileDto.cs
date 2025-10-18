@@ -16,5 +16,7 @@ namespace BL.Dtos
         public string? City { get; set; }
         public byte? YearsOfExperience { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? CvFilePath { get; set; } // stored as relative URL
+
     }
 }

@@ -1,0 +1,30 @@
+﻿@model BL.Dtos.ApplicationDto
+@{
+    ViewData["Title"] = "Delete Application";
+}
+
+<div class="container mt-4 col-md-8">
+    <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+            <h4><i class="bi bi-trash"></i> Delete Application</h4>
+        </div>
+        <div class="card-body">
+            <h5>Are you sure you want to deactivate this application?</h5>
+            <p><strong>Job Post:</strong> @Model.JobPostId</p>
+            <p><strong>Applicant:</strong> @Model.JobSeekerId</p>
+            <p><strong>Status:</strong> @Model.Status</p>
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-check-circle"></i> Confirm Deactivation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,55 @@
+﻿@model IEnumerable<BL.Dtos.ApplicationDto>
+@{
+    ViewData["Title"] = "My Applications";
+}
+<div class="container mt-4">
+    <h2 class="fw-bold text-primary mb-3"><i class="bi bi-person-lines-fill"></i> My Applications</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">You haven’t applied for any jobs yet.</div>
+    }
+    else
+    {
+        <table class="table table-bordered table-hover shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Job Post</th>
+                    <th>Status</th>
+                    <th>Applied At</th>
+                    <th>Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var app in Model)
+                {
+                    <tr>
+                        <td>@app.JobPostId</td>
+                        <td>
+                            @switch (app.Status)
+                            {
+                                case 0:
+                                    <span class="badge bg-secondary">Pending</span>
+                                    ; break;
+                                case 1:
+
+                                    <span class="badge bg-success">Accepted</span>
+                                    ; break;
+                                case 2:
+
+                                    <span class="badge bg-danger">Rejected</span>
+                                    ; break;
+                                default:
+
+                                    <span class="badge bg-warning">In Review</span>
+                                    ; break;
+                            }
+                        </td>
+                        <td>@app.AppliedAt.ToShortDateString()</td>
+                        <td>@app.UpdatedAt?.ToShortDateString()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

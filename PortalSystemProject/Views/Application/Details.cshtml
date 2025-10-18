@@ -1,0 +1,36 @@
+﻿@model BL.Dtos.ApplicationDto
+
+@{
+    ViewData["Title"] = "Application Details";
+}
+
+<div class="container mt-4 col-md-8">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h4><i class="bi bi-file-earmark-text"></i> Application Details</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Job Post</dt>
+                <dd class="col-sm-8">@Model.JobPostId</dd>
+
+                <dt class="col-sm-4">Job Seeker</dt>
+                <dd class="col-sm-8">@Model.JobSeekerId</dd>
+
+                <dt class="col-sm-4">Cover Letter</dt>
+                <dd class="col-sm-8">@Model.CoverLetter</dd>
+
+                <dt class="col-sm-4">Status</dt>
+                <dd class="col-sm-8">@Model.Status</dd>
+
+                <dt class="col-sm-4">Applied At</dt>
+                <dd class="col-sm-8">@Model.AppliedAt.ToShortDateString()</dd>
+            </dl>
+
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit</a>
+            </div>
+        </div>
+    </div>
+</div>
