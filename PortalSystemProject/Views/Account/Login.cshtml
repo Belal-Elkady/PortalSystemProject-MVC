@@ -1,0 +1,193 @@
+﻿@model LoginDto
+@{
+    Layout = null;
+    ViewData["Title"] = "Sign in";
+    var returnUrl = Context.Request.Query["returnUrl"].ToString();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- Fonts & Icons (نفس المستخدمة في صفحة Register) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- نفس ملف الستايل العام -->
+    <link href="~/css/login.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <!-- START: Left/Form side -->
+        <div class="form-side">
+            <div class="brand">
+                <div class="brand-icon"><i class="fas fa-rocket"></i></div>
+                <div class="brand-name">YourApp</div>
+            </div>
+
+            <h2>Sign in to your account</h2>
+            <p class="subtitle">Welcome back! Please enter your details</p>
+
+            <!-- TempData / Model errors -->
+            @if (TempData["Error"] is string error && !string.IsNullOrWhiteSpace(error))
+            {
+                <div class="alert alert-danger">@error</div>
+            }
+            <div asp-validation-summary="ModelOnly" class="alert" id="errorAlert"></div>
+
+            <form asp-controller="Account"
+                  asp-action="Login"
+                  asp-route-returnUrl="@(string.IsNullOrEmpty(returnUrl) ? Url.Content("~/") : returnUrl)"
+                  method="post"
+                  novalidate
+                  class="register-form">
+                @Html.AntiForgeryToken()
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label asp-for="Email" class="form-label">Email Address</label>
+                    <div class="input-wrapper with-icon">
+                        <i class="fas fa-envelope input-icon" aria-hidden="true"></i>
+                        <input asp-for="Email"
+                               class="form-control"
+                               type="email"
+                               inputmode="email"
+                               autocomplete="username"
+                               placeholder="you@example.com"
+                               aria-describedby="emailHelp" />
+                    </div>
+                    <small id="emailHelp" class="form-text text-muted">Use your registered email.</small>
+                    <span asp-validation-for="Email" class="validation-message"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label asp-for="Password" class="form-label">Password</label>
+                    <div class="input-wrapper with-icon">
+                        <i class="fas fa-lock input-icon" aria-hidden="true"></i>
+                        <input asp-for="Password"
+                               class="form-control"
+                               type="password"
+                               autocomplete="current-password"
+                               placeholder="••••••••"
+                               id="password" />
+                        <button type="button" class="toggle-password" data-target="password" aria-label="Toggle password visibility">
+                            <i class="far fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="validation-message"></span>
+                </div>
+
+                <!-- Remember + Forgot -->
+                <div class="form-check d-flex justify-between align-center">
+                    <label class="form-check-label">
+                        <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
+                        <span>Remember me</span>
+                    </label>
+
+                    <a asp-controller="Account"
+                       asp-action="ForgotPassword"
+                       class="link"
+                       title="Recover your password">Lost password?</a>
+                </div>
+
+                <button type="submit" class="btn-primary w-100 mt-2">Sign in</button>
+            </form>
+
+            <div class="divider"><span class="divider-text">OR CONTINUE WITH</span></div>
+
+            <!-- Social Login (نفس الشكل بتاع صفحة Register) -->
+            <div class="social-buttons">
+                <form asp-controller="Account" asp-action="ExternalLogin" method="post" class="inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnUrl" value="@(string.IsNullOrEmpty(returnUrl) ? Url.Content("~/") : returnUrl)" />
+                    <button type="submit" name="provider" value="Google" class="btn-social google" title="Login with Google">
+                        <i class="fab fa-google"></i>
+                    </button>
+                    <button type="submit" name="provider" value="Facebook" class="btn-social facebook" title="Login with Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                    <button type="submit" name="provider" value="Twitter" class="btn-social twitter" title="Login with X/Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="footer-link">
+                Not registered?
+                <a asp-controller="Account"
+                   asp-action="Register"
+                   asp-route-returnUrl="@(string.IsNullOrEmpty(returnUrl) ? Url.Content("~/") : returnUrl)">Create account</a>
+            </div>
+        </div>
+        <!-- END: Left/Form side -->
+        <!-- START: Right/Illustration side -->
+        <div class="illustration-side">
+            <div class="illustration-content">
+                <div class="illustration-icon"><i class="fas fa-user-shield"></i></div>
+                <h1>Welcome Back!</h1>
+                <p>Secure login. Fast access. Continue where you left off.</p>
+
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="feature-text">
+                            <h3>Secure Access</h3>
+                            <p>2FA & encrypted sessions</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="feature-text">
+                            <h3>Fast Login</h3>
+                            <p>Optimized for speed</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon"><i class="fas fa-users"></i></div>
+                        <div class="feature-text">
+                            <h3>Trusted by 10K+</h3>
+                            <p>Join our community</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optional: screenshots -->
+                <div class="illustrations-extra">
+                    <img src="~/loginpage/img/screenshot 2025-10-16 120925.png" alt="App preview 1" style="max-width:320px;" />
+                    <img src="~/loginpage/img/screenshot 2025-10-16 121042.png" alt="App preview 2" style="max-width:250px;" />
+                </div>
+            </div>
+        </div>
+        <!-- END: Right/Illustration side -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        // Toggle password (نفس لوجيك صفحة Register)
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.toggle-password');
+            if (!btn) return;
+            const targetId = btn.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            const icon = btn.querySelector('i');
+            if (!input) return;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+    </script>
+</body>
+</html>

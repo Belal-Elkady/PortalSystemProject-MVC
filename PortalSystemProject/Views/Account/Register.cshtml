@@ -1,0 +1,282 @@
+﻿@model RegisterDto
+@{
+    Layout = null;
+    ViewData["Title"] = "Create Account";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Your CSS (استخدم نفس ملفك الحالي) -->
+    <link href="~/css/login.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <!-- START: Left/Form side -->
+        <div class="form-side">
+            <div class="brand">
+                <div class="brand-icon"><i class="fas fa-rocket"></i></div>
+                <div class="brand-name">YourApp</div>
+            </div>
+
+            <h2>Create your account</h2>
+            <p class="subtitle">Join thousands of users already on our platform</p>
+
+            <!-- Summary validation -->
+            <div asp-validation-summary="All" class="alert" id="errorAlert"></div>
+
+            <form id="registerForm"
+                  class="register-form"
+                  asp-controller="Account"
+                  asp-action="Register"
+                  method="post">
+                @Html.AntiForgeryToken()
+
+                <!-- Username -->
+                <div class="form-group">
+                    <label asp-for="UserName" class="form-label"></label>
+                    <input asp-for="UserName" class="form-control" placeholder="john.doe" />
+                    <span asp-validation-for="UserName" class="validation-message"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label asp-for="Email" class="form-label"></label>
+                    <div class="input-wrapper with-icon">
+                        <i class="fas fa-envelope input-icon" aria-hidden="true"></i>
+                        <input asp-for="Email" class="form-control" placeholder="you@example.com" />
+                    </div>
+                    <span asp-validation-for="Email" class="validation-message"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label asp-for="Password" class="form-label"></label>
+                    <div class="input-wrapper with-icon">
+                        <i class="fas fa-lock input-icon" aria-hidden="true"></i>
+                        <input asp-for="Password" class="form-control" id="password" placeholder="••••••••" />
+                        <button type="button" class="toggle-password" data-target="password" aria-label="Toggle password visibility">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    <div id="pwdStrength" class="password-strength" style="display:none;"></div>
+                    <span asp-validation-for="Password" class="validation-message"></span>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label asp-for="ConfirmPassword" class="form-label"></label>
+                    <div class="input-wrapper with-icon">
+                        <i class="fas fa-lock input-icon" aria-hidden="true"></i>
+                        <input asp-for="ConfirmPassword" class="form-control" id="confirmPassword" placeholder="••••••••" />
+                        <button type="button" class="toggle-password" data-target="confirmPassword" aria-label="Toggle password visibility">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="validation-message"></span>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group">
+                    <label asp-for="Phone" class="form-label"></label>
+                    <div class="input-wrapper with-icon">
+                        <i class="fas fa-phone input-icon" aria-hidden="true"></i>
+                        <input asp-for="Phone" class="form-control" type="tel" placeholder="+20 1X XXX XXXX" />
+                    </div>
+                    <span asp-validation-for="Phone" class="validation-message"></span>
+                </div>
+
+                <!-- Roles (from Model.Roles) -->
+                <div class="form-group">
+                    <label class="form-label">Select Your Role</label>
+                    <div class="role-options">
+                        @if (Model?.Roles != null)
+                        {
+                            foreach (var role in Model.Roles)
+                            {
+                                var roleId = $"role_{role}".Replace(" ", "_");
+                                <input type="radio" asp-for="Role" value="@role" id="@roleId" />
+                                <label for="@roleId" class="role-option">
+                                    @* اختياري: آيكون حسب الاسم *@
+                                    @{
+                                        var icon = "fa-user";
+                                        if (role.ToLower().Contains("student")) icon = "fa-user-graduate";
+                                        else if (role.ToLower().Contains("teacher")) icon = "fa-chalkboard-teacher";
+                                        else if (role.ToLower().Contains("professional")) icon = "fa-briefcase";
+                                    }
+                                    <i class="fas @icon"></i> @role
+                                </label>
+                            }
+                        }
+                        else
+                        {
+                            <!-- fallback ثابت لو Roles فاضية -->
+                            <input type="radio" asp-for="Role" value="Student" id="role_student" />
+                            <label for="role_student" class="role-option"><i class="fas fa-user-graduate"></i> Student</label>
+
+                            <input type="radio" asp-for="Role" value="Teacher" id="role_teacher" />
+                            <label for="role_teacher" class="role-option"><i class="fas fa-chalkboard-teacher"></i> Teacher</label>
+
+                            <input type="radio" asp-for="Role" value="Professional" id="role_professional" />
+                            <label for="role_professional" class="role-option"><i class="fas fa-briefcase"></i> Professional</label>
+                        }
+                    </div>
+                    <span asp-validation-for="Role" class="validation-message"></span>
+                </div>
+
+                <button type="submit" class="btn-primary">Create Account</button>
+            </form>
+
+            <div class="divider"><span class="divider-text">OR CONTINUE WITH</span></div>
+
+            <!-- Social Login (اربطها بعملياتك الفعلية) -->
+            <div class="social-buttons">
+                <a class="btn-social google" asp-controller="ExternalAuth" asp-action="Google"><i class="fab fa-google"></i></a>
+                <a class="btn-social facebook" asp-controller="ExternalAuth" asp-action="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a class="btn-social twitter" asp-controller="ExternalAuth" asp-action="Twitter"><i class="fab fa-twitter"></i></a>
+            </div>
+
+            <div class="footer-link">
+                Already have an account?
+                <a asp-controller="Account" asp-action="Login">Sign in</a>
+            </div>
+        </div>
+        <!-- END: Left/Form side -->
+        <!-- START: Right/Illustration side -->
+        <div class="illustration-side">
+            <div class="illustration-content">
+                <div class="illustration-icon"><i class="fas fa-user-shield"></i></div>
+                <h1>Welcome Aboard!</h1>
+                <p>Start your journey with us today. Fast, secure, and easy registration in just a few clicks.</p>
+
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="feature-text">
+                            <h3>Secure & Private</h3>
+                            <p>Your data is encrypted and protected</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="feature-text">
+                            <h3>Quick Setup</h3>
+                            <p>Get started in under 2 minutes</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon"><i class="fas fa-users"></i></div>
+                        <div class="feature-text">
+                            <h3>Join 10K+ Users</h3>
+                            <p>Be part of our growing community</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optional: screenshots من مشروعك -->
+                <div class="illustrations-extra">
+                    <img src="~/loginpage/img/screenshot 2025-10-16 120925.png" alt="App preview 1" style="max-width:320px;" />
+                    <img src="~/loginpage/img/screenshot 2025-10-16 121042.png" alt="App preview 2" style="max-width:250px;" />
+                </div>
+            </div>
+        </div>
+        <!-- END: Right/Illustration side -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        // Toggle password visibility
+        document.querySelectorAll('.toggle-password').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                const icon = btn.querySelector('i');
+
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.replace('fa-eye', 'fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.replace('fa-eye-slash', 'fa-eye');
+                }
+            });
+        });
+
+        // Password strength checker
+        const pwdInput = document.getElementById('password');
+        const meter = document.getElementById('pwdStrength');
+
+        function scorePassword(value) {
+            let score = 0;
+            if (!value) return 0;
+
+            const letters = {};
+            for (let i = 0; i < value.length; i++) {
+                letters[value[i]] = (letters[value[i]] || 0) + 1;
+                score += 5.0 / letters[value[i]];
+            }
+
+            const variations = {
+                digits: /\d/.test(value),
+                lower: /[a-z]/.test(value),
+                upper: /[A-Z]/.test(value),
+                nonWords: /\W/.test(value)
+            };
+
+            let variationCount = 0;
+            for (let check in variations) {
+                variationCount += variations[check] ? 1 : 0;
+            }
+            score += (variationCount - 1) * 10;
+
+            return parseInt(score);
+        }
+
+        function updateStrength() {
+            const s = scorePassword(pwdInput.value);
+            let text = '';
+            let strengthClass = '';
+
+            if (!pwdInput.value) {
+                meter.style.display = 'none';
+                return;
+            }
+
+            meter.style.display = 'block';
+
+            if (s > 80) {
+                text = '🔒 Strong password';
+                strengthClass = 'strong';
+            } else if (s > 60) {
+                text = '✓ Good password';
+                strengthClass = 'good';
+            } else if (s > 30) {
+                text = '⚠ Weak password';
+                strengthClass = 'weak';
+            } else {
+                text = '✕ Very weak password';
+                strengthClass = 'very-weak';
+            }
+
+            meter.textContent = text;
+            meter.className = `password-strength ${strengthClass}`;
+        }
+
+        if (pwdInput) {
+            pwdInput.addEventListener('input', updateStrength);
+        }
+    </script>
+</body>
+</html>

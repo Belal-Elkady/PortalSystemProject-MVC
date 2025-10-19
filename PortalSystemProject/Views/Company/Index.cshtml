@@ -29,7 +29,7 @@
                     <td>@item.City</td>
                     <td>@item.Country</td>
                     <td>
-                        @if (item.Status == 1)
+                        @if ((int)item.Status == 1)
                         {
                             <span class="badge bg-success">Approved</span>
                         }

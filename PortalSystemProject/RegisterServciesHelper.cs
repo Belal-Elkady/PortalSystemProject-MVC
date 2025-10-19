@@ -7,6 +7,7 @@ using DAL.Repositories;
 using Domains.UserModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PortalSystemProject.Services;
 using Serilog;
 
 namespace PortalSystemProject
@@ -59,6 +60,8 @@ namespace PortalSystemProject
             builder.Services.AddScoped<IJobSeekerProfileRepository, JobSeekerProfileService>();
             builder.Services.AddScoped<IJobTypeRepository, JobTypeService>();
             builder.Services.AddScoped<ISavedJobRepository, SavedJobService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
             //builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserService>();
         }
     }

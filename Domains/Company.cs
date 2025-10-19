@@ -28,7 +28,7 @@ namespace Domains
         public string? Description { get; set; }
 
         // 1=Approved, 0=Pending
-        public byte Status { get; set; } = 1;
+        public CompanyStatus Status { get; set; } = CompanyStatus.Pending;
 
         // Navs
         public List<EmployerProfile> EmployerProfiles { get; set; } = new List<EmployerProfile>();

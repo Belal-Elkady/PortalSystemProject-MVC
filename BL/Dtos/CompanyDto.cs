@@ -1,4 +1,5 @@
 ﻿using BL.Dtos.Base;
+using Domains;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,8 @@ namespace BL.Dtos
         public string? City { get; set; }
         public string? LogoUrl { get; set; }
         public string? Description { get; set; }
-        public byte Status { get; set; }          // 1=Approved, 0=Pending
+        // 1=Approved, 0=Pending
+        public CompanyStatus Status { get; set; } = CompanyStatus.Pending;
         public DateTime CreatedAt { get; set; }
     }
 }
