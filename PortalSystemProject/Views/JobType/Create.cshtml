@@ -1,4 +1,5 @@
 ﻿@model BL.Dtos.JobTypeDto
+
 @{
     ViewData["Title"] = "Create Job Type";
 }
@@ -6,19 +7,21 @@
 <div class="container mt-4 col-md-6">
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
-            <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Create New Job Type</h4>
+            <h4><i class="bi bi-plus-circle"></i> Create Job Type</h4>
         </div>
         <div class="card-body">
             <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
                 <div class="mb-3">
                     <label asp-for="Name" class="form-label fw-bold"></label>
-                    <input asp-for="Name" class="form-control" placeholder="Enter job type name..." />
+                    <input asp-for="Name" class="form-control" placeholder="e.g. Full-Time, Part-Time, Internship" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
 
                 <div class="d-flex justify-content-between">
                     <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left-circle"></i> Back
+                        <i class="bi bi-arrow-left"></i> Back
                     </a>
                     <button type="submit" class="btn btn-success">
                         <i class="bi bi-save"></i> Save
@@ -28,9 +31,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

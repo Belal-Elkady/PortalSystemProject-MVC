@@ -1,90 +1,27 @@
-﻿@model BL.Dtos.JobSeekerProfileDto
-
+﻿@model BL.Dtos.EmployerProfileDto
 @{
-    ViewData["Title"] = "Job Seeker Details";
+    ViewData["Title"] = "Employer Profile Details";
 }
 
 <div class="container mt-4 col-md-8">
-    <div class="card shadow-lg border-0">
+    <div class="card shadow">
         <div class="card-header bg-info text-white">
-            <h4 class="mb-0"><i class="bi bi-person-badge"></i> @Model.Headline</h4>
+            <h4><i class="bi bi-person-vcard"></i> @Model.FullName</h4>
         </div>
-
         <div class="card-body">
-            <!-- ✅ Success & Error Messages -->
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
+            <p><strong>Company:</strong> @Model.CompanyName</p>
+            <p><strong>Position:</strong> @Model.JobTitle</p>
+            <p><strong>Phone:</strong> @Model.Phone</p>
+            <p><strong>User ID:</strong> @Model.UserId</p>
 
-            <!-- ✅ Profile Details -->
-            <p><strong>Summary:</strong> @Model.Summary</p>
-            <p><strong>Location:</strong> @Model.City, @Model.Country</p>
-            <p><strong>Experience:</strong> @(Model.YearsOfExperience ?? 0) years</p>
-            <p><strong>Created:</strong> @Model.CreatedAt.ToShortDateString()</p>
-
-            <hr />
-
-            <!-- ✅ CV Management -->
-            <h5><i class="bi bi-file-earmark-text"></i> CV Management</h5>
-
-            @if (!string.IsNullOrEmpty(Model.CvFilePath))
-            {
-                <div class="mb-3">
-                    <a href="@Model.CvFilePath" target="_blank" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-file-earmark-arrow-down"></i> View Current CV
-                    </a>
-                </div>
-            }
-            else
-            {
-                <p class="text-muted">No CV uploaded yet.</p>
-            }
-
-            <form asp-action="UploadCv" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="id" value="@Model.Id" />
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Upload New CV (PDF, DOC, DOCX)</label>
-                    <input type="file" name="cvFile" class="form-control" required />
-                </div>
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-upload"></i> Upload / Replace CV
-                </button>
-            </form>
-
-            <hr />
-
-            <!-- ✅ Navigation Buttons -->
-            <div class="d-flex justify-content-between mt-3">
+            <div class="d-flex justify-content-between mt-4">
                 <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left-circle"></i> Back
+                    <i class="bi bi-arrow-left"></i> Back
                 </a>
                 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-                    <i class="bi bi-pencil-square"></i> Edit Profile
+                    <i class="bi bi-pencil"></i> Edit
                 </a>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        // ✅ Auto-hide alerts after 4 seconds
-        setTimeout(() => {
-            document.querySelectorAll('.alert').forEach(alert => {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 4000);
-    </script>
-}

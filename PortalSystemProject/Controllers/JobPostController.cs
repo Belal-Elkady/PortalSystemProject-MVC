@@ -1,16 +1,20 @@
 ﻿using BL.Contracts;
 using BL.Dtos;
+using Domains.UserModel;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace PortalSystemProject.Controllers
 {
+    //[Authorize(Roles = "Employer,Admin,JobSeeker")]
     public class JobPostController : Controller
     {
         private readonly IJobPostRepository _jobPostRepo;
         private readonly ICompanyRepository _companyRepo;
         private readonly IJobCategoryRepository _categoryRepo;
         private readonly IJobTypeRepository _typeRepo;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<JobPostController> _logger;
 
         public JobPostController(
@@ -18,23 +22,42 @@ namespace PortalSystemProject.Controllers
             ICompanyRepository companyRepo,
             IJobCategoryRepository categoryRepo,
             IJobTypeRepository typeRepo,
+            UserManager<ApplicationUser> userManager,
             ILogger<JobPostController> logger)
         {
             _jobPostRepo = jobPostRepo;
             _companyRepo = companyRepo;
             _categoryRepo = categoryRepo;
             _typeRepo = typeRepo;
+            _userManager = userManager;
             _logger = logger;
         }
 
-
-
-        // GET: JobPost
-        public IActionResult Index(string search, Guid? categoryId, Guid? typeId, string sortOrder, int page = 1, int pageSize = 5)
+        // =====================================================
+        // 🔹 INDEX — Browse & filter jobs by category, type, location
+        // =====================================================
+        public async Task<IActionResult> Index(
+            string search,
+            Guid? categoryId,
+            Guid? typeId,
+            string sortOrder,
+            int page = 1,
+            int pageSize = 5)
         {
+            var currentUser = await _userManager.GetUserAsync(User);
             var jobPosts = _jobPostRepo.GetAll();
 
-            //  Search
+            // 🧭 Role-based view
+            if (User.IsInRole("Employer"))
+            {
+                jobPosts = jobPosts.Where(j => j.CreatedByUserId == currentUser.Id).ToList();
+            }
+            else if (User.IsInRole("JobSeeker"))
+            {
+                jobPosts = jobPosts.Where(j => j.IsActive).ToList();
+            }
+
+            // 🔍 Search
             if (!string.IsNullOrWhiteSpace(search))
             {
                 search = search.ToLower();
@@ -45,14 +68,14 @@ namespace PortalSystemProject.Controllers
                 ).ToList();
             }
 
-            //  Filters
+            // 🎯 Filters
             if (categoryId.HasValue && categoryId.Value != Guid.Empty)
                 jobPosts = jobPosts.Where(j => j.JobCategoryId == categoryId.Value).ToList();
 
             if (typeId.HasValue && typeId.Value != Guid.Empty)
                 jobPosts = jobPosts.Where(j => j.JobTypeId == typeId.Value).ToList();
 
-            //  Sorting
+            // 🧩 Sorting
             ViewBag.TitleSort = sortOrder == "title_asc" ? "title_desc" : "title_asc";
             ViewBag.CitySort = sortOrder == "city_asc" ? "city_desc" : "city_asc";
             ViewBag.SalarySort = sortOrder == "salary_asc" ? "salary_desc" : "salary_asc";
@@ -71,13 +94,13 @@ namespace PortalSystemProject.Controllers
                 _ => jobPosts.OrderByDescending(j => j.PublishedAt).ToList()
             };
 
-            //  Pagination
+            // 📄 Pagination
             int totalItems = jobPosts.Count;
             int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
             jobPosts = jobPosts.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-            //  Send view data
+            // 🧾 Send data to View
             ViewBag.JobCategories = new SelectList(_categoryRepo.GetAll(), "Id", "Name", categoryId);
             ViewBag.JobTypes = new SelectList(_typeRepo.GetAll(), "Id", "Name", typeId);
             ViewBag.Search = search;
@@ -89,10 +112,9 @@ namespace PortalSystemProject.Controllers
             return View(jobPosts);
         }
 
-
-
-
-        // GET: Create
+        // =====================================================
+        // 🔹 CREATE
+        // =====================================================
         [HttpGet]
         public IActionResult Create()
         {
@@ -100,49 +122,39 @@ namespace PortalSystemProject.Controllers
             return View();
         }
 
-        //POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(JobPostDto dto)
+        public async Task<IActionResult> Create(JobPostDto dto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                dto.PublishedAt = DateTime.Now;
-                //dto.CreatedByUserId = Guid.NewGuid(); // placeholder (later bind from logged-in user)
-                dto.CreatedByUserId = new Guid("C593B4A8-7A98-4A9C-92D9-1018B41CDD72");
-
-                _jobPostRepo.Add(dto);
-                return RedirectToAction(nameof(Index));
+                LoadDropdowns();
+                return View(dto);
             }
 
-            LoadDropdowns();
-            return View(dto);
+            try
+            {
+                var currentUser = await _userManager.GetUserAsync(User);
+                dto.PublishedAt = DateTime.UtcNow;
+                dto.CreatedByUserId = currentUser.Id;
+                dto.IsActive = true;
+
+                _jobPostRepo.Add(dto);
+                TempData["Success"] = "✅ Job post created successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating job post");
+                TempData["Error"] = "❌ Failed to create job post.";
+                LoadDropdowns();
+                return View(dto);
+            }
         }
-        // POST: Create rtying to work it with out FK user id but it failed
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult Create(JobPostDto dto)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        dto.PublishedAt = DateTime.Now;
 
-        //        // TEMP FIX: comment this line (it causes FK issue)
-        //        // dto.CreatedByUserId = Guid.NewGuid();
-
-        //        //  instead, use a placeholder existing user or Guid.Empty
-        //        dto.CreatedByUserId = Guid.Empty;
-
-        //        _jobPostRepo.Add(dto);
-        //        return RedirectToAction(nameof(Index));
-        //    }
-
-        //    LoadDropdowns();
-        //    return View(dto);
-        //}
-
-
-        // GET: Edit/{id}
+        // =====================================================
+        // 🔹 EDIT
+        // =====================================================
         [HttpGet]
         public IActionResult Edit(Guid id)
         {
@@ -154,45 +166,46 @@ namespace PortalSystemProject.Controllers
             return View(jobPost);
         }
 
-        // POST: Edit/{id}
-        // POST: Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Guid id, JobPostDto dto)
+        public async Task<IActionResult> Edit(Guid id, JobPostDto dto)
         {
             if (id != dto.Id)
                 return BadRequest();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    // Get the existing job post to preserve fields not in the form
-                    var existingJobPost = _jobPostRepo.GetById(id);
-                    if (existingJobPost == null)
-                        return NotFound();
-
-                    // Preserve these fields from the existing record
-                    dto.PublishedAt = existingJobPost.PublishedAt;
-                    dto.CreatedByUserId = existingJobPost.CreatedByUserId;
-                    dto.IsActive = existingJobPost.IsActive;
-
-                    // Update the job post
-                    _jobPostRepo.Update(dto);
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error updating JobPost");
-                    ModelState.AddModelError("", "An error occurred while updating the job post. Please try again.");
-                }
+                LoadDropdowns();
+                return View(dto);
             }
 
-            LoadDropdowns();
-            return View(dto);
+            try
+            {
+                var existing = _jobPostRepo.GetById(id);
+                if (existing == null)
+                    return NotFound();
+
+                // Preserve existing fields
+                dto.PublishedAt = existing.PublishedAt;
+                dto.CreatedByUserId = existing.CreatedByUserId;
+                dto.IsActive = existing.IsActive;
+
+                _jobPostRepo.Update(dto);
+                TempData["Success"] = "✅ Job post updated successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating job post");
+                TempData["Error"] = "❌ Failed to update job post.";
+                LoadDropdowns();
+                return View(dto);
+            }
         }
 
-        // GET: Details/{id}
+        // =====================================================
+        // 🔹 DETAILS
+        // =====================================================
         public IActionResult Details(Guid id)
         {
             var jobPost = _jobPostRepo.GetById(id);
@@ -202,7 +215,9 @@ namespace PortalSystemProject.Controllers
             return View(jobPost);
         }
 
-        // GET: Delete/{id}
+        // =====================================================
+        // 🔹 DELETE (ChangeStatus)
+        // =====================================================
         [HttpGet]
         public IActionResult Delete(Guid id)
         {
@@ -213,15 +228,27 @@ namespace PortalSystemProject.Controllers
             return View(jobPost);
         }
 
-        // POST: Delete/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(Guid id)
         {
-            _jobPostRepo.ChangeStatus(id);
+            try
+            {
+                _jobPostRepo.ChangeStatus(id);
+                TempData["Success"] = "🗑️ Job post deleted (deactivated) successfully.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting job post");
+                TempData["Error"] = "❌ Failed to delete job post.";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
+        // =====================================================
+        // 🔹 Helper to load dropdowns
+        // =====================================================
         private void LoadDropdowns()
         {
             ViewBag.Companies = new SelectList(_companyRepo.GetAll(), "Id", "Name");

@@ -10,5 +10,9 @@ namespace BL.Dtos
     public class JobTypeDto:BaseDto
     {
         public string Name { get; set; } = string.Empty;
+        public Guid CreatedByUserId { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string? CreatedByUserName { get; set; }
+
     }
 }

@@ -1,16 +1,20 @@
 ﻿@model BL.Dtos.JobTypeDto
+
 @{
     ViewData["Title"] = "Edit Job Type";
 }
 
 <div class="container mt-4 col-md-6">
     <div class="card shadow">
-        <div class="card-header bg-warning text-dark">
-            <h4 class="mb-0"><i class="bi bi-pencil-square"></i> Edit Job Type</h4>
+        <div class="card-header bg-warning text-white">
+            <h4><i class="bi bi-pencil"></i> Edit Job Type</h4>
         </div>
         <div class="card-body">
             <form asp-action="Edit" method="post">
                 <input type="hidden" asp-for="Id" />
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
                 <div class="mb-3">
                     <label asp-for="Name" class="form-label fw-bold"></label>
                     <input asp-for="Name" class="form-control" />
@@ -19,10 +23,10 @@
 
                 <div class="d-flex justify-content-between">
                     <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left-circle"></i> Back
+                        <i class="bi bi-arrow-left"></i> Back
                     </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save"></i> Update
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Update
                     </button>
                 </div>
             </form>

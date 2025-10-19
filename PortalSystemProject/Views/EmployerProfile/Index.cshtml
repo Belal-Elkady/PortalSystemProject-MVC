@@ -1,42 +1,62 @@
 ﻿@model IEnumerable<BL.Dtos.EmployerProfileDto>
-
 @{
-    ViewData["Title"] = "Employer Profiles";
+    ViewData["Title"] = "My Employer Profile";
 }
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-bold text-primary"><i class="bi bi-person-badge"></i> Employer Profiles</h2>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Add Employer
-        </a>
-    </div>
+    <h2 class="fw-bold text-primary mb-4"><i class="bi bi-person-workspace"></i> My Employer Profile</h2>
 
-    <table class="table table-striped table-hover shadow-sm">
-        <thead class="table-dark">
-            <tr>
-                <th>Job Title</th>
-                <th>Company</th>
-                <th>User ID</th>
-                <th>Created At</th>
-                <th class="text-end">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+    <!-- ✅ Success / Error Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">
+            You don't have an employer profile yet.
+            <a asp-action="Create" class="btn btn-primary btn-sm ms-2">Create Now</a>
+        </div>
+    }
+    else
+    {
+        <table class="table table-striped table-hover shadow-sm">
+            <thead class="table-dark">
                 <tr>
-                    <td>@item.JobTitle</td>
-                    <td>@item.CompanyId</td>
-                    <td>@item.UserId</td>
-                    <td>@item.CreatedAt.ToShortDateString()</td>
-                    <td class="text-end">
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm"><i class="bi bi-eye"></i></a>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm"><i class="bi bi-pencil"></i></a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></a>
-                    </td>
+                    <th>Full Name</th>
+                    <th>Company</th>
+                    <th>Position</th>
+                    <th>Phone</th>
+                    <th class="text-end">Actions</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var emp in Model)
+                {
+                    <tr>
+                        <td>@emp.FullName</td>
+                        <td>@emp.CompanyName</td>
+                        <td>@emp.JobTitle</td>
+                        <td>@emp.Phone</td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@emp.Id" class="btn btn-outline-info btn-sm me-1">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@emp.Id" class="btn btn-outline-warning btn-sm me-1">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@emp.Id" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </div>

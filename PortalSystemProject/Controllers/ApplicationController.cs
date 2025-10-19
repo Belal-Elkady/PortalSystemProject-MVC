@@ -1,34 +1,38 @@
 ﻿using BL.Contracts;
 using BL.Dtos;
+using Domains;
+using Domains.UserModel;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
 
 namespace PortalSystemProject.Controllers
 {
+    [Authorize] // ✅ Only logged-in users can access applications
     public class ApplicationController : Controller
     {
         private readonly IApplicationRepository _applicationRepo;
         private readonly IJobPostRepository _jobPostRepo;
         private readonly IJobSeekerProfileRepository _jobSeekerRepo;
         private readonly ILogger<ApplicationController> _logger;
-
-        private readonly Guid _testUserId = new Guid("C593B4A8-7A98-4A9C-92D9-1018B41CDD72");
+        private readonly UserManager<ApplicationUser> _userManager; // ✅ for logged-in user
 
         public ApplicationController(
             IApplicationRepository applicationRepo,
             IJobPostRepository jobPostRepo,
             IJobSeekerProfileRepository jobSeekerRepo,
-            ILogger<ApplicationController> logger)
+            ILogger<ApplicationController> logger,
+            UserManager<ApplicationUser> userManager)
         {
             _applicationRepo = applicationRepo;
             _jobPostRepo = jobPostRepo;
             _jobSeekerRepo = jobSeekerRepo;
             _logger = logger;
+            _userManager = userManager;
         }
 
-        // ================== BASIC CRUD ==================
-
+        // ================== ADMIN/EMPLOYER VIEW ==================
         public IActionResult Index()
         {
             var apps = _applicationRepo.GetAll();
@@ -44,15 +48,23 @@ namespace PortalSystemProject.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(ApplicationDto dto)
+        public async Task<IActionResult> Create(ApplicationDto dto)
         {
             if (ModelState.IsValid)
             {
-                dto.ApplicantUserId = _testUserId;
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    TempData["Error"] = "You must be logged in to apply.";
+                    return RedirectToAction("Login", "Account");
+                }
+
+                dto.ApplicantUserId = user.Id;
                 dto.AppliedAt = DateTime.Now;
                 dto.Status = 0;
 
                 _applicationRepo.Add(dto);
+                TempData["Success"] = "Application created successfully.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -73,45 +85,48 @@ namespace PortalSystemProject.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Guid id, ApplicationDto dto)
+        public async Task<IActionResult> Edit(Guid id, ApplicationDto dto)
         {
             if (id != dto.Id)
                 return BadRequest();
 
             if (ModelState.IsValid)
             {
-                // 🩵 Ensure mandatory values are set
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    TempData["Error"] = "You must be logged in to update applications.";
+                    return RedirectToAction("Login", "Account");
+                }
+
                 if (dto.JobPostId == Guid.Empty || dto.JobSeekerId == Guid.Empty)
                 {
                     ModelState.AddModelError("", "Job Post and Job Seeker are required.");
-                    LoadDropdowns(); // re-fill your SelectLists
+                    LoadDropdowns();
                     return View(dto);
                 }
 
-                // 🩵 Ensure AppliedAt is valid
                 if (dto.AppliedAt == default)
                     dto.AppliedAt = DateTime.Now;
 
-                // 🩵 Ensure ApplicantUserId placeholder exists
-                if (dto.ApplicantUserId == Guid.Empty)
-                    dto.ApplicantUserId = new Guid("C593B4A8-7A98-4A9C-92D9-1018B41CDD72"); // test user
+                dto.ApplicantUserId = user.Id;
 
                 try
                 {
                     _applicationRepo.Update(dto);
+                    TempData["Success"] = "Application updated successfully.";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error updating Application");
-                    ModelState.AddModelError("", "An error occurred while saving changes. Please try again.");
+                    ModelState.AddModelError("", "An error occurred while saving changes.");
                 }
             }
 
             LoadDropdowns();
             return View(dto);
         }
-
 
         [HttpGet]
         public IActionResult Details(Guid id)
@@ -138,30 +153,34 @@ namespace PortalSystemProject.Controllers
         public IActionResult DeleteConfirmed(Guid id)
         {
             _applicationRepo.ChangeStatus(id);
+            TempData["Success"] = "Application deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
 
-        // ================== JOB SEEKER METHODS ==================
+        // ================== JOB SEEKER VIEW ==================
 
-        // Apply to a specific job (from JobPost list)
         [HttpGet]
-        public IActionResult Apply(Guid jobPostId)
+        public async Task<IActionResult> Apply(Guid jobPostId)
         {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                TempData["Error"] = "You must be logged in to apply.";
+                return RedirectToAction("Login", "Account");
+            }
+
             var job = _jobPostRepo.GetById(jobPostId);
             if (job == null)
                 return NotFound();
 
-            ViewBag.JobPostTitle = job.Title;
-
-            // Select job seeker (temporary test user)
-            var seeker = _jobSeekerRepo.GetAll()
-                .FirstOrDefault(x => x.UserId == _testUserId);
-
+            var seeker = _jobSeekerRepo.GetAll().FirstOrDefault(s => s.UserId == user.Id);
             if (seeker == null)
             {
-                TempData["Error"] = "No Job Seeker profile found for this user.";
-                return RedirectToAction("Index", "JobSeekerProfile");
+                TempData["Error"] = "Please create your Job Seeker profile first.";
+                return RedirectToAction("Create", "JobSeekerProfile");
             }
+
+            ViewBag.JobPostTitle = job.Title;
 
             var dto = new ApplicationDto
             {
@@ -174,13 +193,20 @@ namespace PortalSystemProject.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Apply(ApplicationDto dto)
+        public async Task<IActionResult> Apply(ApplicationDto dto)
         {
             if (ModelState.IsValid)
             {
-                dto.ApplicantUserId = _testUserId;
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    TempData["Error"] = "You must be logged in to apply.";
+                    return RedirectToAction("Login", "Account");
+                }
+
+                dto.ApplicantUserId = user.Id;
                 dto.AppliedAt = DateTime.Now;
-                dto.Status = 0; // Pending
+                dto.Status = 0;
 
                 _applicationRepo.Add(dto);
                 TempData["Success"] = "Application submitted successfully!";
@@ -190,12 +216,17 @@ namespace PortalSystemProject.Controllers
             return View(dto);
         }
 
-        // List applications submitted by the current (test) user
-        public IActionResult MyApplications()
+        [HttpGet]
+        public async Task<IActionResult> MyApplications()
         {
-            var seeker = _jobSeekerRepo.GetAll()
-                .FirstOrDefault(x => x.UserId == _testUserId);
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                TempData["Error"] = "You must be logged in to view your applications.";
+                return RedirectToAction("Login", "Account");
+            }
 
+            var seeker = _jobSeekerRepo.GetAll().FirstOrDefault(s => s.UserId == user.Id);
             if (seeker == null)
             {
                 TempData["Error"] = "Please create your Job Seeker profile first.";

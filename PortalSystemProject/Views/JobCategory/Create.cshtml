@@ -1,36 +1,25 @@
 ﻿@model BL.Dtos.JobCategoryDto
+
 @{
     ViewData["Title"] = "Create Job Category";
 }
 
-<div class="container mt-4 col-md-6">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Create New Category</h4>
-        </div>
-        <div class="card-body">
-            <form asp-action="Create">
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label fw-bold"></label>
-                    <input asp-for="Name" class="form-control" placeholder="Enter category name..." />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
+<div class="container mt-4">
+    <h2><i class="bi bi-plus-circle"></i> Create Job Category</h2>
+    <hr />
 
-                <div class="d-flex justify-content-between">
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left-circle"></i> Back
-                    </a>
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-save"></i> Save
-                    </button>
-                </div>
-            </form>
+    <form asp-action="Create" method="post">
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">Category Name</label>
+            <input asp-for="Name" class="form-control" placeholder="Enter category name" />
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
-    </div>
+
+        <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Save</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

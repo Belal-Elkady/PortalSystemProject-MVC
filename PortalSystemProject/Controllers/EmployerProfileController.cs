@@ -1,10 +1,14 @@
 ﻿using BL.Contracts;
 using BL.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace PortalSystemProject.Controllers
 {
+    //[Authorize(Roles = "Employer")]
     public class EmployerProfileController : Controller
     {
         private readonly IEmployerProfileRepository _employerRepo;
@@ -21,11 +25,22 @@ namespace PortalSystemProject.Controllers
             _logger = logger;
         }
 
+        //  Helper: Get current logged-in user ID
+        private Guid GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
+        }
+
         // GET: EmployerProfile
         public IActionResult Index()
         {
+            var userId = GetCurrentUserId();
             var employers = _employerRepo.GetAll();
-            return View(employers);
+
+            //  Only show this user's profiles
+            var userProfiles = employers.Where(e => e.UserId == userId).ToList();
+            return View(userProfiles);
         }
 
         // GET: Create
@@ -41,12 +56,27 @@ namespace PortalSystemProject.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(EmployerProfileDto dto)
         {
+            var userId = GetCurrentUserId();
+            if (userId == Guid.Empty)
+            {
+                TempData["Error"] = "You must be logged in to create an employer profile.";
+                return RedirectToAction("Login", "Account");
+            }
+
             if (ModelState.IsValid)
             {
-                // 🧩 Temporary user ID (replace later when auth is added)
-                dto.UserId = new Guid("C593B4A8-7A98-4A9C-92D9-1018B41CDD72");
+                dto.UserId = userId;
+
+                // Prevent multiple profiles per user
+                var existing = _employerRepo.GetAll().FirstOrDefault(e => e.UserId == userId);
+                if (existing != null)
+                {
+                    TempData["Error"] = "You already have an employer profile.";
+                    return RedirectToAction(nameof(Index));
+                }
 
                 _employerRepo.Add(dto);
+                TempData["Success"] = "Employer profile created successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -62,6 +92,10 @@ namespace PortalSystemProject.Controllers
             if (emp == null)
                 return NotFound();
 
+            // 🧩 Security: Prevent editing other users' profiles
+            if (emp.UserId != GetCurrentUserId())
+                return Forbid();
+
             LoadDropdowns();
             return View(emp);
         }
@@ -74,10 +108,25 @@ namespace PortalSystemProject.Controllers
             if (id != dto.Id)
                 return BadRequest();
 
+            var userId = GetCurrentUserId();
+            if (userId == Guid.Empty)
+                return Unauthorized();
+
             if (ModelState.IsValid)
             {
-                _employerRepo.Update(dto);
-                return RedirectToAction(nameof(Index));
+                dto.UserId = userId;
+
+                try
+                {
+                    _employerRepo.Update(dto);
+                    TempData["Success"] = "Profile updated successfully!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error updating Employer Profile");
+                    TempData["Error"] = "An error occurred while updating the profile.";
+                }
             }
 
             LoadDropdowns();
@@ -92,6 +141,9 @@ namespace PortalSystemProject.Controllers
             if (emp == null)
                 return NotFound();
 
+            if (emp.UserId != GetCurrentUserId())
+                return Forbid();
+
             return View(emp);
         }
 
@@ -103,15 +155,26 @@ namespace PortalSystemProject.Controllers
             if (emp == null)
                 return NotFound();
 
+            if (emp.UserId != GetCurrentUserId())
+                return Forbid();
+
             return View(emp);
         }
 
-        // POST: Delete
+        // POST: Delete (Change status)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(Guid id)
         {
+            var emp = _employerRepo.GetById(id);
+            if (emp == null)
+                return NotFound();
+
+            if (emp.UserId != GetCurrentUserId())
+                return Forbid();
+
             _employerRepo.ChangeStatus(id);
+            TempData["Success"] = "Profile deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
 

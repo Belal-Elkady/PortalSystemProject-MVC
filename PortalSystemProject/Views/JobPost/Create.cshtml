@@ -3,96 +3,64 @@
     ViewData["Title"] = "Create Job Post";
 }
 
-<div class="container mt-4 col-md-10">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h4><i class="bi bi-plus-circle"></i> Add New Job</h4>
+<div class="container mt-4 col-md-8">
+    <h2><i class="bi bi-plus-circle"></i> Create Job Post</h2>
+    <hr />
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label fw-bold"></label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
         </div>
-        <div class="card-body">
-            <form asp-action="Create">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label asp-for="Title" class="form-label fw-bold"></label>
-                        <input asp-for="Title" class="form-control" />
-                        <span asp-validation-for="Title" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="CompanyId" class="form-label fw-bold"></label>
-                        <select asp-for="CompanyId" class="form-select" asp-items="ViewBag.Companies">
-                            <option value="">-- Select Company --</option>
-                        </select>
-                    </div>
-                </div>
 
-                <div class="mb-3">
-                    <label asp-for="Description" class="form-label fw-bold"></label>
-                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label asp-for="JobCategoryId" class="form-label fw-bold"></label>
-                        <select asp-for="JobCategoryId" class="form-select" asp-items="ViewBag.JobCategories">
-                            <option value="">-- Select Category --</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="JobTypeId" class="form-label fw-bold"></label>
-                        <select asp-for="JobTypeId" class="form-select" asp-items="ViewBag.JobTypes">
-                            <option value="">-- Select Type --</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label asp-for="Country" class="form-label fw-bold"></label>
-                        <input asp-for="Country" class="form-control" />
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="City" class="form-label fw-bold"></label>
-                        <input asp-for="City" class="form-control" />
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label asp-for="MinSalary" class="form-label fw-bold"></label>
-                        <input asp-for="MinSalary" class="form-control" />
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="MaxSalary" class="form-label fw-bold"></label>
-                        <input asp-for="MaxSalary" class="form-control" />
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label asp-for="Requirements" class="form-label fw-bold"></label>
-                    <textarea asp-for="Requirements" class="form-control" rows="3"></textarea>
-                    <span asp-validation-for="Requirements" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="MinExperienceYears" class="form-label fw-bold"></label>
-                    <input asp-for="MinExperienceYears" class="form-control" placeholder="e.g. 2-4 years" />
-                    <span asp-validation-for="MinExperienceYears" class="text-danger"></span>
-                </div>
-
-
-                <div class="d-flex justify-content-between">
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left-circle"></i> Back
-                    </a>
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-save"></i> Save
-                    </button>
-                </div>
-            </form>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="JobCategoryId" class="form-label fw-bold">Category</label>
+                <select asp-for="JobCategoryId" class="form-select" asp-items="ViewBag.JobCategories"></select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="JobTypeId" class="form-label fw-bold">Type</label>
+                <select asp-for="JobTypeId" class="form-select" asp-items="ViewBag.JobTypes"></select>
+            </div>
         </div>
-    </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="CompanyId" class="form-label fw-bold">Company</label>
+                <select asp-for="CompanyId" class="form-select" asp-items="ViewBag.Companies"></select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="MinSalary" class="form-label fw-bold"></label>
+                <input asp-for="MinSalary" class="form-control" />
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="MaxSalary" class="form-label fw-bold"></label>
+                <input asp-for="MaxSalary" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Country" class="form-label fw-bold"></label>
+                <input asp-for="Country" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="City" class="form-label fw-bold"></label>
+                <input asp-for="City" class="form-control" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label fw-bold"></label>
+            <textarea asp-for="Description" rows="4" class="form-control"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-save"></i> Save
+        </button>
+        <a asp-action="Index" class="btn btn-secondary ms-2"><i class="bi bi-arrow-left"></i> Back</a>
+    </form>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

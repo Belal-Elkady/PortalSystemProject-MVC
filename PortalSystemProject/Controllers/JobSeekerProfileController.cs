@@ -1,21 +1,29 @@
 ﻿using BL.Contracts;
 using BL.Dtos;
+using Domains.UserModel;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace PortalSystemProject.Controllers
 {
+    [Authorize]
     public class JobSeekerProfileController : Controller
     {
         private readonly IJobSeekerProfileRepository _jobSeekerRepo;
         private readonly ILogger<JobSeekerProfileController> _logger;
+        private readonly UserManager<ApplicationUser> _userManager; // ✅ add this
 
         public JobSeekerProfileController(
             IJobSeekerProfileRepository jobSeekerRepo,
-            ILogger<JobSeekerProfileController> logger)
+            ILogger<JobSeekerProfileController> logger,
+            UserManager<ApplicationUser> userManager // ✅ inject here
+        )
         {
             _jobSeekerRepo = jobSeekerRepo;
             _logger = logger;
+            _userManager = userManager; // ✅ assign
         }
 
         // GET: JobSeekerProfile
@@ -32,17 +40,25 @@ namespace PortalSystemProject.Controllers
         // POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(JobSeekerProfileDto dto)
+        public async Task<IActionResult> Create(JobSeekerProfileDto dto)
         {
             if (ModelState.IsValid)
             {
-                dto.UserId = new Guid("C593B4A8-7A98-4A9C-92D9-1018B41CDD72"); // test user
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    TempData["Error"] = "You must be logged in to create a profile.";
+                    return RedirectToAction("Login", "Account");
+                }
+
+                dto.UserId = user.Id;
                 dto.CreatedAt = DateTime.Now;
                 _jobSeekerRepo.Add(dto);
                 return RedirectToAction(nameof(Index));
             }
             return View(dto);
         }
+
 
         // GET: Edit
         [HttpGet]
