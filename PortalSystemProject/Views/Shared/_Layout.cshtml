@@ -21,35 +21,63 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="JobType" asp-action="Index">Job Types</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="JobCategory" asp-action="Index">Job category</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Company" asp-action="Index">Company</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="JobPost" asp-action="Index">job post</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="EmployerProfile" asp-action="Index">Employer Profile</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="JobSeekerProfile" asp-action="Index">JobSeeker Profile</a>
-                        </li>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Application" asp-action="Index">Applications</a>
-                        </li>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            //<!-- ✅ ADMIN -->
+                            if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="Admin" asp-controller="Admin" asp-action="Index">🛠️ Admin Panel</a>
+                                </li>
+                            }
 
+                            //<!-- ✅ EMPLOYER -->
+                            else if (User.IsInRole("Employer"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Company" asp-action="Index">🏢 My Company</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="JobPost" asp-action="Index">📄 Job Posts</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="EmployerProfile" asp-action="Index">👤 Employer Profile</a>
+                                </li>
+                            }
+
+                            //<!-- ✅ JOB SEEKER -->
+                            else if (User.IsInRole("JobSeeker"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Home" asp-action="AllJobs">💼 Browse Jobs</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="JobSeekerProfile" asp-action="Index">👤 My Profile</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Application" asp-action="Index">📬 My Applications</a>
+                                </li>
+                            }
+
+                            //<!-- ✅ زرار تسجيل الخروج -->
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="form-inline">
+                                    <button type="submit" class="btn btn-link nav-link text-dark">🚪 Logout</button>
+                                </form>
+                            </li>
+
+
+                        }
+                        else
+                        {
+                            <!-- ✅ المستخدم مش داخل -->
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">🔑 Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">📝 Register</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

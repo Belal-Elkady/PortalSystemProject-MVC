@@ -119,15 +119,36 @@ public class UserService : IUserService
             };
         }
 
-        // اضف الدور
-        var roleName = string.IsNullOrEmpty(registerDto.Role) ? "User" : registerDto.Role;
+        // add the role
+        var roleName = string.IsNullOrEmpty(registerDto.Role) ? "JobSeeker" : registerDto.Role;
+
+        // sure the role exists
+        var roleExists = await _roleManager.RoleExistsAsync(roleName);
+        if (!roleExists)
+        {
+            await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = roleName });
+        }
+
+        // add user to the new role
         await _userManager.AddToRoleAsync(user, roleName);
 
-        // سجل الدخول مباشرةً (cookie)
+        //login the user after register
         var appUser = await _userManager.FindByEmailAsync(registerDto.Email);
         if (appUser != null)
         {
-            await _signInManager.SignInAsync(appUser, isPersistent: false);
+            // نجهز Claims فيها اسم المستخدم بدل الإيميل
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, appUser.Id.ToString()),
+        new Claim(ClaimTypes.Name, appUser.UserName ?? appUser.Email), // 👈 هنا الاسم اللي هيظهر فوق
+        new Claim(ClaimTypes.Email, appUser.Email)
+    };
+
+            // نضيف الـ claims دي للمستخدم
+            await _userManager.AddClaimsAsync(appUser, claims);
+
+            // ونسجل دخوله بالـ claims دي
+            await _signInManager.SignInWithClaimsAsync(appUser, isPersistent: false, claims);
         }
 
         return new UserResultDto

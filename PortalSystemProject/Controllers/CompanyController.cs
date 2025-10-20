@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace PortalSystemProject.Controllers
 {
-    //[Authorize(Roles = "Employer,Admin")] // Only employers or admins can manage companies
+    [Authorize(Roles = "Employer,Admin")] // Only employers or admins can manage companies
     public class CompanyController : Controller
     {
         private readonly ICompanyRepository _companyRepo;

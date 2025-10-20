@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
+
 namespace PortalSystemProject
 {
     public class Program
@@ -26,6 +27,23 @@ namespace PortalSystemProject
 
 
             var app = builder.Build();
+
+            //  Seed Roles (Admin, Employer, JobSeeker)
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+
+                string[] roleNames = { "Admin", "Employer", "JobSeeker" };
+
+                foreach (var roleName in roleNames)
+                {
+                    var roleExists = roleManager.RoleExistsAsync(roleName).GetAwaiter().GetResult();
+                    if (!roleExists)
+                    {
+                        roleManager.CreateAsync(new IdentityRole<Guid> { Name = roleName }).GetAwaiter().GetResult();
+                    }
+                }
+            }
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -37,6 +55,7 @@ namespace PortalSystemProject
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();

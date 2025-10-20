@@ -45,7 +45,6 @@ public class AccountController : Controller
             return View(registerDto);
         }
 
-
         var result = await _userService.RegisterAsync(registerDto);
 
         if (!result.Success)
@@ -59,10 +58,8 @@ public class AccountController : Controller
             }
 
             registerDto.Roles = _userService.GetRoles();
-
             return View(registerDto);
         }
-
 
         if (result.Success)
         {
@@ -70,16 +67,25 @@ public class AccountController : Controller
 
             if (user != null)
             {
-                if (registerDto.Role == "Employer")
+                // ✅ Employer -> Create Company
+                if (user.Role == "Employer")
                 {
                     return RedirectToAction("Create", "Company", new { userId = result.Id });
                 }
-                return RedirectToAction("Login", "Account");
+
+                // ✅ Admin -> Control panel
+                if (user.Role == "Admin")
+                {
+                    return RedirectToRoute(new { area = "Admin", controller = "Admin", action = "Index" });
+                }
+
+                // ✅ JobSeeker -> AllJobs
+                return RedirectToAction("AllJobs", "Home");
             }
         }
 
-
-        return View("Register", registerDto);
+        registerDto.Roles = _userService.GetRoles();
+        return View(registerDto);
     }
 
 
@@ -133,7 +139,7 @@ public class AccountController : Controller
             if (employerProfile == null || employerProfile.CompanyId == null)
             {
                 TempData["Message"] = "You need to create your company profile first.";
-                return RedirectToAction("CreateCompany", "Company");
+                return RedirectToAction("Create", "Company");
             }
 
             // نجيب الشركة اللي تابعة له
@@ -142,7 +148,7 @@ public class AccountController : Controller
             if (company == null)
             {
                 TempData["Message"] = "Company not found. Please create it again.";
-                return RedirectToAction("CreateCompany", "Company");
+                return RedirectToAction("Create", "Company");
             }
 
             // ✅ نتحقق من حالة الشركة
