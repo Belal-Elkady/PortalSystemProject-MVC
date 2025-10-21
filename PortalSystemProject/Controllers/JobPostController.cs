@@ -1,13 +1,14 @@
 ﻿using BL.Contracts;
 using BL.Dtos;
 using Domains.UserModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace PortalSystemProject.Controllers
 {
-    //[Authorize(Roles = "Employer,Admin,JobSeeker")]
+    [Authorize]
     public class JobPostController : Controller
     {
         private readonly IJobPostRepository _jobPostRepo;

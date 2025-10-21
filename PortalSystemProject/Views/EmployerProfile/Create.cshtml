@@ -4,6 +4,16 @@
 }
 
 <div class="container mt-4 col-md-8">
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <div>@error.ErrorMessage</div>
+            }
+        </div>
+    }
+
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
             <h4><i class="bi bi-plus-circle"></i> Create Employer Profile</h4>

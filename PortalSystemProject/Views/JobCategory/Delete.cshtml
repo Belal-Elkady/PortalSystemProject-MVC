@@ -23,7 +23,7 @@
         <dd class="col-sm-9">@Model.CreatedAt.ToString("dd MMM yyyy")</dd>
     </dl>
 
-    <form asp-action="DeleteConfirmed" method="post">
+    <form asp-action="Delete" method="post">
         <input type="hidden" asp-for="Id" />
         <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Delete</button>
         <a asp-action="Index" class="btn btn-secondary">Cancel</a>

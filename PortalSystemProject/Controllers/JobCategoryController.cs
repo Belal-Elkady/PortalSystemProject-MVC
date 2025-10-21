@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace PortalSystemProject.Controllers
 {
-    //[Authorize(Roles = "Employer,Admin")]
+    [Authorize(Roles = "Employer,Admin")]
     public class JobCategoryController : Controller
     {
         private readonly IJobCategoryRepository _jobCategoryRepo;

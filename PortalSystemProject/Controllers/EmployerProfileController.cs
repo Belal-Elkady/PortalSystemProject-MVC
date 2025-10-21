@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace PortalSystemProject.Controllers
 {
-    //[Authorize(Roles = "Employer")]
+    [Authorize(Roles = "Employer,Admin")]
     public class EmployerProfileController : Controller
     {
         private readonly IEmployerProfileRepository _employerRepo;
@@ -53,36 +53,53 @@ namespace PortalSystemProject.Controllers
 
         // POST: Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Create(EmployerProfileDto dto)
+[ValidateAntiForgeryToken]
+public IActionResult Create(EmployerProfileDto dto)
+{
+    var userId = GetCurrentUserId();
+    if (userId == Guid.Empty)
+    {
+        TempData["Error"] = "You must be logged in to create an employer profile.";
+        return RedirectToAction("Login", "Account");
+    }
+
+    if (ModelState.IsValid)
+    {
+        dto.UserId = userId;
+        dto.CreatedAt = DateTime.UtcNow; // ✅ important
+
+        var existing = _employerRepo.GetAll().FirstOrDefault(e => e.UserId == userId);
+        if (existing != null)
         {
-            var userId = GetCurrentUserId();
-            if (userId == Guid.Empty)
-            {
-                TempData["Error"] = "You must be logged in to create an employer profile.";
-                return RedirectToAction("Login", "Account");
-            }
-
-            if (ModelState.IsValid)
-            {
-                dto.UserId = userId;
-
-                // Prevent multiple profiles per user
-                var existing = _employerRepo.GetAll().FirstOrDefault(e => e.UserId == userId);
-                if (existing != null)
-                {
-                    TempData["Error"] = "You already have an employer profile.";
-                    return RedirectToAction(nameof(Index));
-                }
-
-                _employerRepo.Add(dto);
-                TempData["Success"] = "Employer profile created successfully!";
-                return RedirectToAction(nameof(Index));
-            }
-
-            LoadDropdowns();
-            return View(dto);
+            TempData["Error"] = "You already have an employer profile.";
+            return RedirectToAction(nameof(Index));
         }
+
+        try
+        {
+            _employerRepo.Add(dto);
+            TempData["Success"] = "✅ Employer profile created successfully!";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Error creating employer profile");
+            // ❌ Error message shown when staying on the same form
+            ModelState.AddModelError(string.Empty, "❌ Failed to create employer profile. Please check your input and try again.");
+        }
+    }
+    else
+    {
+        // Validation errors
+        ModelState.AddModelError(string.Empty, "❌ Some required fields are missing or invalid.");
+    }
+
+    // Reload dropdowns and return to form
+    LoadDropdowns();
+    return View(dto);
+}
+
+
 
         // GET: Edit
         [HttpGet]

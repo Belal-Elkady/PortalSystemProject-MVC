@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace PortalSystemProject.Controllers
 {
-    //[Authorize(Roles = "Admin,Employer")] // optional – enable later if roles are active
+    [Authorize(Roles = "Admin,Employer")] // optional – enable later if roles are active
     public class JobTypeController : Controller
     {
         private readonly IJobTypeRepository _jobTypeRepo;
