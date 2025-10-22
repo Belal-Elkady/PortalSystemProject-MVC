@@ -19,40 +19,41 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            //<!-- ✅ ADMIN -->
+                           // <!-- ✅ ADMIN -->
                             if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="Admin" asp-controller="Admin" asp-action="Index">🛠️ Admin Panel</a>
+                                    <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">🛠️ Admin Dashboard</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Company" asp-action="Index">🏢 My Company</a>
+                                    <a class="nav-link text-dark" asp-controller="Company" asp-action="Index">🏢 Companies</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="JobPost" asp-action="Index">📄 Job Posts</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="EmployerProfile" asp-action="Index">👤 Employer Profile</a>
+                                    <a class="nav-link text-dark" asp-controller="EmployerProfile" asp-action="Index">👤 Employer Profiles</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="JobSeekerProfile" asp-action="Index">👤Job Seeker Profile</a>
+                                    <a class="nav-link text-dark" asp-controller="JobSeekerProfile" asp-action="Index">🎯 Job Seeker Profiles</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Application" asp-action="Index">📬 My Applications</a>
+                                    <a class="nav-link text-dark" asp-controller="Application" asp-action="Index">📬 Applications</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="JobCategory" asp-action="Index">Job Category</a>
+                                    <a class="nav-link text-dark" asp-controller="JobCategory" asp-action="Index">📂 Job Categories</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="JobType" asp-action="Index">Job Type</a>
+                                    <a class="nav-link text-dark" asp-controller="JobType" asp-action="Index">⚙️ Job Types</a>
                                 </li>
                             }
 
-                            //<!-- ✅ EMPLOYER -->
+                           // <!-- ✅ EMPLOYER -->
                             else if (User.IsInRole("Employer"))
                             {
                                 <li class="nav-item">
@@ -66,7 +67,7 @@
                                 </li>
                             }
 
-                            //<!-- ✅ JOB SEEKER -->
+                           // <!-- ✅ JOB SEEKER -->
                             else if (User.IsInRole("JobSeeker"))
                             {
                                 <li class="nav-item">
@@ -80,18 +81,16 @@
                                 </li>
                             }
 
-                            //<!-- ✅ زرار تسجيل الخروج -->
-                            <li class="nav-item">
+                          //  <!-- ✅ زرار تسجيل الخروج -->
+                            <li class="nav-item ms-auto">
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="form-inline">
-                                    <button type="submit" class="btn btn-link nav-link text-dark">🚪 Logout</button>
+                                    <button type="submit" class="btn btn-link nav-link text-danger">🚪 Logout</button>
                                 </form>
                             </li>
-
-
                         }
                         else
                         {
-                            <!-- ✅ المستخدم مش داخل -->
+                         //   <!-- ✅ المستخدم مش داخل -->
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">🔑 Login</a>
                             </li>

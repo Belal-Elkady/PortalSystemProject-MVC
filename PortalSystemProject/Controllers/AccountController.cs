@@ -130,7 +130,7 @@ public class AccountController : Controller
         // ✅ لو المستخدم أدمن
         if (dbUser.Role != null && dbUser.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
         {
-            return RedirectToRoute(new { area = "Admin", controller = "Admin", action = "Index" });
+            return RedirectToRoute(new { area = "Admin", controller = "Dashboard", action = "Index" });
         }
 
         // ✅ لو المستخدم Employer

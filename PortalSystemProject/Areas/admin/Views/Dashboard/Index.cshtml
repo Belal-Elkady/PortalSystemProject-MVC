@@ -1,1 +1,92 @@
-﻿<h1>Admin dashmlsmd</h1>
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <h1 class="mb-4 text-center fw-bold text-primary">
+        🛠️ Admin Dashboard
+    </h1>
+
+    <div class="row g-4 justify-content-center">
+        <!-- Users -->
+        <div class="col-md-3">
+            <div class="card shadow border-0 rounded-4 text-center">
+                <div class="card-body">
+                    <h5 class="text-secondary"><i class="bi bi-people-fill"></i> Users</h5>
+                    <h2 class="fw-bold">@ViewBag.TotalUsers</h2>
+                    <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn btn-outline-primary btn-sm mt-2">Manage</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Companies -->
+        <div class="col-md-3">
+            <div class="card shadow border-0 rounded-4 text-center">
+                <div class="card-body">
+                    <h5 class="text-secondary"><i class="bi bi-building"></i> Companies</h5>
+                    <h2 class="fw-bold">@ViewBag.TotalCompanies</h2>
+                    <a asp-area="" asp-controller="Company" asp-action="Index" class="btn btn-outline-success btn-sm mt-2">View</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Posts -->
+        <div class="col-md-3">
+            <div class="card shadow border-0 rounded-4 text-center">
+                <div class="card-body">
+                    <h5 class="text-secondary"><i class="bi bi-briefcase-fill"></i> Job Posts</h5>
+                    <h2 class="fw-bold">@ViewBag.TotalJobs</h2>
+                    <a asp-area="" asp-controller="JobPost" asp-action="Index" class="btn btn-outline-warning btn-sm mt-2">View</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications -->
+        <div class="col-md-3">
+            <div class="card shadow border-0 rounded-4 text-center">
+                <div class="card-body">
+                    <h5 class="text-secondary"><i class="bi bi-envelope-check-fill"></i> Applications</h5>
+                    <h2 class="fw-bold">@ViewBag.TotalApplications</h2>
+                    <a asp-area="" asp-controller="Application" asp-action="Index" class="btn btn-outline-danger btn-sm mt-2">View</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5" />
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h4 class="fw-bold text-secondary mb-4">
+                📊 Platform Statistics
+            </h4>
+            <canvas id="statsChart" height="120"></canvas>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('statsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Users', 'Companies', 'Jobs', 'Applications'],
+                datasets: [{
+                    label: 'Totals',
+                    data: [@ViewBag.TotalUsers, @ViewBag.TotalCompanies, @ViewBag.TotalJobs, @ViewBag.TotalApplications],
+                    backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Platform Overview', font: { size: 16 } }
+                }
+            }
+        });
+    </script>
+}

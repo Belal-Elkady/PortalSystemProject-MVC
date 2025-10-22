@@ -28,19 +28,64 @@ namespace PortalSystemProject
 
             var app = builder.Build();
 
-            //  Seed Roles (Admin, Employer, JobSeeker)
             using (var scope = app.Services.CreateScope())
             {
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                var services = scope.ServiceProvider;
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                var config = services.GetRequiredService<IConfiguration>();
 
+                // 1️- Ensure Roles Exist
                 string[] roleNames = { "Admin", "Employer", "JobSeeker" };
-
                 foreach (var roleName in roleNames)
                 {
                     var roleExists = roleManager.RoleExistsAsync(roleName).GetAwaiter().GetResult();
                     if (!roleExists)
                     {
                         roleManager.CreateAsync(new IdentityRole<Guid> { Name = roleName }).GetAwaiter().GetResult();
+                    }
+                }
+
+                // 2️- Read admin credentials from appsettings.json
+                var adminSection = config.GetSection("AdminUser");
+                var adminEmail = adminSection["Email"];
+                var adminUserName = adminSection["UserName"];
+                var adminPassword = adminSection["Password"];
+
+                // 3️- Create admin if not exists
+                if (!string.IsNullOrWhiteSpace(adminEmail) && !string.IsNullOrWhiteSpace(adminPassword))
+                {
+                    var adminUser = userManager.FindByEmailAsync(adminEmail).GetAwaiter().GetResult();
+                    if (adminUser == null)
+                    {
+                        adminUser = new ApplicationUser
+                        {
+                            UserName = adminUserName ?? adminEmail,
+                            Email = adminEmail,
+                            EmailConfirmed = true
+                        };
+
+                        var createResult = userManager.CreateAsync(adminUser, adminPassword).GetAwaiter().GetResult();
+                        if (createResult.Succeeded)
+                        {
+                            userManager.AddToRoleAsync(adminUser, "Admin").GetAwaiter().GetResult();
+                            Console.WriteLine("✅ Admin user created successfully!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("❌ Failed to create admin user:");
+                            foreach (var err in createResult.Errors)
+                                Console.WriteLine($" - {err.Description}");
+                        }
+                    }
+                    else
+                    {
+                        // Ensure user has Admin role
+                        var rolesForUser = userManager.GetRolesAsync(adminUser).GetAwaiter().GetResult();
+                        if (!rolesForUser.Contains("Admin"))
+                        {
+                            userManager.AddToRoleAsync(adminUser, "Admin").GetAwaiter().GetResult();
+                        }
                     }
                 }
             }
@@ -61,8 +106,9 @@ namespace PortalSystemProject
             app.MapStaticAssets();
 
             app.MapControllerRoute(
-                name: "admin",
+                name: "areas",
                 pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
+
 
 
             app.MapControllerRoute(
