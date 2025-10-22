@@ -1,6 +1,7 @@
 ﻿using BL.Contracts;
 using BL.Dtos;
 using Domains;
+using Domains.UserModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,15 +13,20 @@ public class AccountController : Controller
     private readonly ICompanyRepository _companyRepository;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
     private readonly IEmployerProfileRepository _employerProfile;
-    public AccountController(IUserService userService,
-        RoleManager<IdentityRole<Guid>> roleManager,
-        IEmployerProfileRepository employerProfile,
-        ICompanyRepository companyRepository)
+    private readonly SignInManager<ApplicationUser> _signInManager;
+
+    public AccountController(
+    IUserService userService,
+    RoleManager<IdentityRole<Guid>> roleManager,
+    IEmployerProfileRepository employerProfile,
+    ICompanyRepository companyRepository,
+    SignInManager<ApplicationUser> signInManager)
     {
         _roleManager = roleManager;
         _userService = userService;
         _employerProfile = employerProfile;
         _companyRepository = companyRepository;
+        _signInManager = signInManager;
     }
 
 
@@ -171,4 +177,14 @@ public class AccountController : Controller
         // ✅ باقي المستخدمين العاديين
         return RedirectToAction("AllJops", "Home");
     }
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Logout()
+    {
+        await _signInManager.SignOutAsync();
+        TempData["Message"] = "You have been logged out successfully.";
+        return RedirectToAction("Login", "Account");
+    }
+
 }
