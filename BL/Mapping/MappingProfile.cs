@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BL.Mapping
 {
-    public class MappingProfile :Profile
+    public class MappingProfile : Profile
     {
         public MappingProfile()
         {
@@ -57,6 +57,22 @@ namespace BL.Mapping
                 // if your entity uses CreatedDate/CreatedAt fields, map appropriately, or ignore to preserve existing values
                 .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.Id, opt => opt.Condition((src, dest, srcMember) => srcMember != Guid.Empty));
+
+            CreateMap<Company, CompanyDto>()
+    .ForMember(dest => dest.CreatedByUserId, opt => opt.MapFrom(src => src.CreatedBy))
+    .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedDate))
+    .ReverseMap()
+    .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.CreatedByUserId))
+    .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => src.CreatedAt));
+
+
+            CreateMap<EmployerProfile, EmployerProfileDto>()
+    .ForMember(dest => dest.CompanyName,
+        opt => opt.MapFrom(src => src.Company != null ? src.Company.Name : null))
+    .ReverseMap()
+    .ForMember(dest => dest.Company, opt => opt.Ignore()); // 👈 avoid circular reference
+
+
 
 
         }
