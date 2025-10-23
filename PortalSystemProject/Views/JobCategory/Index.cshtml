@@ -34,8 +34,8 @@
                 <tr>
                     <th>Name</th>
                     <th>Status</th>
-                    <th>Created By</th>
-                    <th>Created At</th>
+                    @* <th>Created By</th>
+                    <th>Created At</th> *@
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -54,8 +54,8 @@
                                 <span class="badge bg-danger">Inactive</span>
                             }
                         </td>
-                        <td>@category.CreatedByUserName</td>
-                        <td>@category.CreatedAt.ToShortDateString()</td>
+                        @* <td>@category.CreatedByUserName</td>
+                        <td>@category.CreatedAt.ToShortDateString()</td> *@
                         <td>
                             <div class="btn-group">
                                 <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-info btn-sm">

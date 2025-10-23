@@ -16,7 +16,7 @@
                 <th>Job Seeker</th>
                 <th>Status</th>
                 <th>Applied</th>
-                <th>Updated</th>
+                @* <th>Updated</th> *@
                 <th class="text-end">Actions</th>
             </tr>
         </thead>
@@ -28,7 +28,7 @@
                     <td>@app.JobSeekerId</td>
                     <td>@app.Status</td>
                     <td>@app.AppliedAt.ToShortDateString()</td>
-                    <td>@app.UpdatedAt?.ToShortDateString()</td>
+                    @* <td>@app.UpdatedAt?.ToShortDateString()</td> *@
                     <td class="text-end">
                         <a asp-action="Details" asp-route-id="@app.Id" class="btn btn-outline-info btn-sm"><i class="bi bi-eye"></i></a>
                         <a asp-action="Edit" asp-route-id="@app.Id" class="btn btn-outline-warning btn-sm"><i class="bi bi-pencil"></i></a>

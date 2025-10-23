@@ -47,7 +47,12 @@ namespace PortalSystemProject.Controllers
         {
             var currentUser = await _userManager.GetUserAsync(User);
             var jobPosts = _jobPostRepo.GetAll();
-
+            // attach company name manually
+            foreach (var job in jobPosts)
+            {
+                var company = _companyRepo.GetById(job.CompanyId);
+                job.CompanyName = company?.Name;
+            }
             // 🧭 Role-based view
             if (User.IsInRole("Employer"))
             {

@@ -24,5 +24,9 @@ namespace BL.Dtos
         //  Optional display-only info (not stored)
         public string? JobTitle { get; set; }
         public string? CompanyName { get; set; }
+
+        public string? JobPostTitle { get; set; }
+        public string? JobSeekerName { get; set; }
+
     }
 }

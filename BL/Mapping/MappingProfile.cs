@@ -73,8 +73,6 @@ namespace BL.Mapping
     .ForMember(dest => dest.Company, opt => opt.Ignore()); // 👈 avoid circular reference
 
 
-
-
         }
     }
 }
