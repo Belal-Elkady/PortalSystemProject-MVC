@@ -1,122 +1,203 @@
-﻿<!DOCTYPE html>
+﻿@{
+    Layout = null;
+    var title = ViewData["Title"] ?? "Creative Theme";
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - PortalSystemProject</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/PortalSystemProject.styles.css" asp-append-version="true" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>@title - Portal System</title>
+
+    <link rel="icon" type="image/x-icon" href="~/assets/favicon.ico" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,400italic,700,700italic" rel="stylesheet" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.css" rel="stylesheet" />
+
+    <link href="~/css/styles.css" rel="stylesheet" />
+
+    @RenderSection("Styles", required: false)
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PortalSystemProject</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+<body id="page-top">
 
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+    <!-- Navigation (Creative theme style) -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
+        <div class="container px-4 px-lg-5">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">Portal System</a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarResponsive" aria-controls="navbarResponsive"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto my-2 my-lg-0">
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        //<!-- ✅ ADMIN -->
+                        if (User.IsInRole("Admin"))
                         {
-                           // <!-- ✅ ADMIN -->
-                            if (User.IsInRole("Admin"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">🛠️ Admin Dashboard</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Company" asp-action="Index">🏢 Companies</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="JobPost" asp-action="Index">📄 Job Posts</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="EmployerProfile" asp-action="Index">👤 Employer Profiles</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="JobSeekerProfile" asp-action="Index">🎯 Job Seeker Profiles</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Application" asp-action="Index">📬 Applications</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="JobCategory" asp-action="Index">📂 Job Categories</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="JobType" asp-action="Index">⚙️ Job Types</a>
-                                </li>
-                            }
-
-                           // <!-- ✅ EMPLOYER -->
-                            else if (User.IsInRole("Employer"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Company" asp-action="Index">🏢 My Company</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="JobPost" asp-action="Index">📄 Job Posts</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="EmployerProfile" asp-action="Index">👤 Employer Profile</a>
-                                </li>
-                            }
-
-                           // <!-- ✅ JOB SEEKER -->
-                            else if (User.IsInRole("JobSeeker"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Home" asp-action="AllJobs">💼 Browse Jobs</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="JobSeekerProfile" asp-action="Index">👤 My Profile</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Application" asp-action="Index">📬 My Applications</a>
-                                </li>
-                            }
-
-                          //  <!-- ✅ زرار تسجيل الخروج -->
-                            <li class="nav-item ms-auto">
-                                <form asp-controller="Account" asp-action="Logout" method="post" class="form-inline">
-                                    <button type="submit" class="btn btn-link nav-link text-danger">🚪 Logout</button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                         //   <!-- ✅ المستخدم مش داخل -->
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">🔑 Login</a>
+                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Admin" asp-action="Index">🛠️ Admin Panel</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">📝 Register</a>
+                                <a class="nav-link text-dark" asp-controller="Company" asp-action="Index">🏢 My Company</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="JobPost" asp-action="Index">📄 Job Posts</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="EmployerProfile" asp-action="Index">👤 Employer Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="JobSeekerProfile" asp-action="Index">👤Job Seeker Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Application" asp-action="Index">📬 My Applications</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="JobCategory" asp-action="Index">Job Category</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="JobType" asp-action="Index">Job Type</a>
                             </li>
                         }
-                    </ul>
+
+                        //<!-- ✅ EMPLOYER -->
+                        else if (User.IsInRole("Employer"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Company" asp-action="Index">🏢 My Company</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="JobPost" asp-action="Index">📄 Job Posts</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="EmployerProfile" asp-action="Index">👤 Employer Profile</a>
+                            </li>
+                        }
+
+                        //<!-- ✅ JOB SEEKER -->
+                        else if (User.IsInRole("JobSeeker"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Home" asp-action="AllJobs">💼 Browse Jobs</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="JobSeekerProfile" asp-action="Index">👤 My Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Application" asp-action="Index">📬 My Applications</a>
+                            </li>
+                        }
+
+                        //<!-- ✅ زرار تسجيل الخروج -->
+                        <li class="nav-item">
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="form-inline">
+                                <button type="submit" class="btn btn-link nav-link text-dark">🚪 Logout</button>
+                            </form>
+                        </li>
+
+
+                    }
+                    else
+                    {
+                        <!-- ✅ المستخدم مش داخل -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">🔑 Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">📝 Register</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Masthead-->
+    <!-- Header Section -->
+    <header class="masthead">
+        <div class="container px-4 px-lg-5 h-100">
+            <div class="row gx-4 gx-lg-5 h-100 align-items-center justify-content-center text-center">
+                <div class="col-lg-8 align-self-end">
+                    <h1 class="text-white font-weight-bold">Portal System</h1>
+                    <hr class="divider" />
+                </div>
+                <div class="col-lg-8 align-self-baseline">
+                    <p class="text-white-75 mb-5">
+                        The Portal System helps companies post jobs, manage applicants, and build strong employer profiles —
+                        while giving job seekers access to trusted opportunities and seamless applications.
+                    </p>
+                    <a class="btn btn-primary btn-xl" asp-controller="Company" asp-action="Index">Explore Companies</a>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - PortalSystemProject - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    </header>
+    <!-- Page content -->
+    <main id="main-content" class="container py-5 mt-5">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-4">
+                @RenderBody()
+            </div>
+        </div>
+    </main>
+    <!-- Portfolio Section (optional static showcase) -->
+    <div id="portfolio">
+        <div class="container-fluid p-0">
+            <div class="row g-0">
+                <div class="col-lg-4 col-sm-6">
+                    <a class="portfolio-box" href="~/assets/img/portfolio/fullsize/1.jpg" title="Modern Dashboard">
+                        <img class="img-fluid" src="~/assets/img/portfolio/thumbnails/1.jpg" alt="Dashboard" />
+                        <div class="portfolio-box-caption">
+                            <div class="project-category text-white-50">Admin</div>
+                            <div class="project-name">Modern Dashboard</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                    <a class="portfolio-box" href="~/assets/img/portfolio/fullsize/2.jpg" title="Company Management">
+                        <img class="img-fluid" src="~/assets/img/portfolio/thumbnails/2.jpg" alt="Company Management" />
+                        <div class="portfolio-box-caption">
+                            <div class="project-category text-white-50">Employers</div>
+                            <div class="project-name">Company Management</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                    <a class="portfolio-box" href="~/assets/img/portfolio/fullsize/3.jpg" title="Job Listings">
+                        <img class="img-fluid" src="~/assets/img/portfolio/thumbnails/3.jpg" alt="Job Listings" />
+                        <div class="portfolio-box-caption">
+                            <div class="project-category text-white-50">Jobs</div>
+                            <div class="project-name">Job Listings</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Call to action-->
+    <section class="page-section bg-dark text-white">
+        <div class="container px-4 px-lg-5 text-center">
+            <!-- Footer -->
+            <footer>
+                <div class="container text-center text-muted small">
+                    &copy; @DateTime.Now.Year - Portal System
+                </div>
+            </footer>
+
+
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js"></script>
+    <script src="~/js/scripts.js"></script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
