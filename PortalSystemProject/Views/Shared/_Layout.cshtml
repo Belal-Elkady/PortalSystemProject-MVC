@@ -43,28 +43,28 @@
                         if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Admin" asp-action="Index">🛠️ Admin Panel</a>
+                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">🛠️ Admin Panel</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Company" asp-action="Index">🏢 My Company</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Company" asp-action="Index">🏢 My Company</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="JobPost" asp-action="Index">📄 Job Posts</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="JobPost" asp-action="Index">📄 Job Posts</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="EmployerProfile" asp-action="Index">👤 Employer Profile</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="EmployerProfile" asp-action="Index">👤 Employer Profile</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="JobSeekerProfile" asp-action="Index">👤Job Seeker Profile</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="JobSeekerProfile" asp-action="Index">👤Job Seeker Profile</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Application" asp-action="Index">📬 My Applications</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Application" asp-action="Index">📬 My Applications</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="JobCategory" asp-action="Index">Job Category</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="JobCategory" asp-action="Index">Job Category</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="JobType" asp-action="Index">Job Type</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="JobType" asp-action="Index">Job Type</a>
                             </li>
                         }
 
@@ -72,13 +72,13 @@
                         else if (User.IsInRole("Employer"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Company" asp-action="Index">🏢 My Company</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Company" asp-action="Index">🏢 My Company</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="JobPost" asp-action="Index">📄 Job Posts</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="JobPost" asp-action="Index">📄 Job Posts</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="EmployerProfile" asp-action="Index">👤 Employer Profile</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="EmployerProfile" asp-action="Index">👤 Employer Profile</a>
                             </li>
                         }
 
@@ -86,13 +86,13 @@
                         else if (User.IsInRole("JobSeeker"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Home" asp-action="AllJobs">💼 Browse Jobs</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="AllJobs">💼 Browse Jobs</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="JobSeekerProfile" asp-action="Index">👤 My Profile</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="JobSeekerProfile" asp-action="Index">👤 My Profile</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Application" asp-action="Index">📬 My Applications</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Application" asp-action="Index">📬 My Applications</a>
                             </li>
                         }
 
@@ -133,7 +133,7 @@
                         The Portal System helps companies post jobs, manage applicants, and build strong employer profiles —
                         while giving job seekers access to trusted opportunities and seamless applications.
                     </p>
-                    <a class="btn btn-primary btn-xl" asp-controller="Company" asp-action="Index">Explore Companies</a>
+                    <a class="btn btn-primary btn-xl" asp-area="" asp-controller="Company" asp-action="Index">Explore Companies</a>
                 </div>
             </div>
         </div>
