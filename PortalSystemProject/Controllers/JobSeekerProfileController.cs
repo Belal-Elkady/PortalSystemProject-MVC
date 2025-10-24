@@ -29,6 +29,7 @@ namespace PortalSystemProject.Controllers
         // GET: JobSeekerProfile
         public IActionResult Index()
         {
+
             var seekers = _jobSeekerRepo.GetAll();
             return View(seekers);
         }
